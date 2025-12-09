@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout/main}">
+<head><title>Dapur Saya - Yummy Market</title></head>
+<body>
+<div layout:fragment="content">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold" style="color: #FF6B6B;">🏪 Dapur Saya</h2>
+            <p class="text-muted">Kelola menu jualanmu di sini.</p>
+        </div>
+        <a th:href="@{/cookies/add}" class="btn btn-danger rounded-pill px-4 shadow-sm" style="background-color: #FF6B6B; border: none;">
+            <i class="bi bi-plus-lg me-2"></i>Tambah Menu
+        </a>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+        <table class="table table-hover align-middle mb-0 text-center">
+            <thead style="background: #FFF0F0; color: #FF6B6B;">
+                <tr>
+                    <th class="py-3">Foto</th>
+                    <th class="py-3 text-start">Menu</th>
+                    <th class="py-3">Harga</th>
+                    <th class="py-3">Stok</th>
+                    <th class="py-3">Terjual</th>
+                    <th class="py-3">Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:if="${cookies.empty}">
+                    <td colspan="6" class="py-5 text-muted">Belum ada menu. Yuk mulai jualan!</td>
+                </tr>
+                <tr th:each="item : ${cookies}">
+                    <td>
+                        <img th:if="${item.imagePath != null}" th:src="@{'/uploads/' + ${item.imagePath}}" class="rounded-3 shadow-sm" style="width: 50px; height: 50px; object-fit: cover;">
+                        <span th:if="${item.imagePath == null}" class="fs-3">🍱</span>
+                    </td>
+                    <td class="text-start">
+                        <div class="fw-bold text-dark" th:text="${item.name}">Nama</div>
+                        <small class="text-muted" th:text="${item.flavor}">Varian</small>
+                    </td>
+                    <td class="fw-bold text-danger" th:text="'Rp ' + ${item.price}">Rp 0</td>
+                    <td><span class="badge bg-warning text-dark rounded-pill" th:text="${item.stock}">0</span></td>
+                    <td class="fw-bold text-success" th:text="${item.soldCount}">0</td>
+                    <td>
+                        <a th:href="@{/cookies/edit/{id}(id=${item.id})}" class="btn btn-sm btn-light border text-primary rounded-circle"><i class="bi bi-pencil-fill"></i></a>
+                        <a th:href="@{/cookies/delete/{id}(id=${item.id})}" class="btn btn-sm btn-light border text-danger rounded-circle ms-1" onclick="return confirm('Hapus menu ini?')"><i class="bi bi-trash-fill"></i></a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>

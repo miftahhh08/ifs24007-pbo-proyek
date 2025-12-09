@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/main}">
+<head>
+    <title>Daftar - Cookie Craft</title>
+</head>
+<body>
+
+<div layout:fragment="content">
+    
+    <style>
+        /* Menggunakan style yang sama dengan Login agar konsisten */
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: linear-gradient(180deg, #fff0f6 0%, #ffebee 100%);
+            overflow-x: hidden;
+            height: 100vh;
+        }
+
+        /* Kartu Register */
+        .card-register {
+            background-color: #ffffff;
+            border: 4px solid #ffc1e3; /* Border Pink */
+            border-radius: 40px;
+            box-shadow: 0 15px 40px rgba(93, 64, 55, 0.08);
+            position: relative;
+            z-index: 10;
+        }
+
+        .title-text {
+            font-family: 'Pacifico', cursive;
+            color: #5D4037;
+            font-size: 2.2rem;
+        }
+
+        /* Form Input */
+        .form-control {
+            border-radius: 30px;
+            border: 2px solid #ffc1e3;
+            padding: 12px 20px;
+            color: #5D4037;
+            background-color: #fff;
+        }
+        .form-control:focus {
+            border-color: #d81b60;
+            box-shadow: 0 0 0 0.25rem rgba(216, 27, 96, 0.15); 
+        }
+
+        /* Tombol */
+        .btn-choco {
+            background-color: #5D4037;
+            border: none;
+            border-radius: 30px;
+            color: #fff;
+            font-weight: 700;
+            padding: 12px;
+            transition: all 0.3s;
+        }
+        .btn-choco:hover {
+            background-color: #3e2723;
+            color: #ffc1e3;
+            transform: scale(1.02);
+        }
+
+        /* Animasi Jatuh */
+        #falling-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .falling-item {
+            position: absolute;
+            top: -50px;
+            animation: fallDown linear infinite;
+            opacity: 0.8;
+        }
+        @keyframes fallDown {
+            0% { transform: translateY(-50px) rotate(0deg); }
+            100% { transform: translateY(110vh) rotate(360deg); }
+        }
+    </style>
+
+    <!-- Background Animasi -->
+    <div id="falling-container"></div>
+
+    <div class="row justify-content-center align-items-center" style="min-height: 85vh;">
+        <div class="col-md-5 col-lg-4">
+            
+            <div class="card card-register mt-5 mb-5">
+                <div class="card-body p-4 p-md-5 text-center">
+                    
+                    <div class="mb-4">
+                        <i class="bi bi-heart-fill text-danger display-4"></i>
+                        <h3 class="title-text mt-2">Gabung Yuk!</h3>
+                        <p class="text-muted small">Buat akun untuk mulai belanja kue</p>
+                    </div>
+
+                    <form th:action="@{/auth/register/save}" method="post" th:object="${registerForm}" class="text-start">
+                        
+                        <!-- Input Nama -->
+                        <div class="mb-3">
+                            <label for="name" class="form-label ms-3 small text-muted fw-bold">Nama Lengkap</label>
+                            <input type="text" class="form-control" id="name" th:field="*{name}"
+                                   th:classappend="${#fields.hasErrors('name')} ? 'is-invalid'" placeholder="Nama Kamu">
+                            <div class="invalid-feedback ms-3" th:errors="*{name}"></div>
+                        </div>
+
+                        <!-- Input Email -->
+                        <div class="mb-3">
+                            <label for="email" class="form-label ms-3 small text-muted fw-bold">Email</label>
+                            <input type="email" class="form-control" id="email" th:field="*{email}" 
+                                   th:classappend="${#fields.hasErrors('email')} ? 'is-invalid'" placeholder="nama@email.com">
+                            <div class="invalid-feedback ms-3" th:errors="*{email}"></div>
+                        </div>
+
+                        <!-- Input Password -->
+                        <div class="mb-4">
+                            <label for="password" class="form-label ms-3 small text-muted fw-bold">Kata Sandi</label>
+                            <input type="password" class="form-control" id="password" th:field="*{password}"
+                                   th:classappend="${#fields.hasErrors('password')} ? 'is-invalid'" placeholder="********">
+                            <div class="invalid-feedback ms-3" th:errors="*{password}"></div>
+                        </div>
+
+                        <!-- Tombol -->
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-choco shadow-sm">
+                                DAFTAR SEKARANG
+                            </button>
+                        </div>
+                    </form>
+
+                    <div class="text-center mt-4">
+                        <span class="text-muted small">Sudah punya akun?</span> 
+                        <a th:href="@{/auth/login}" class="text-decoration-none fw-bold small ms-1" style="color: #d81b60;">Masuk disini</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center mt-3 text-muted small opacity-50 pb-4">
+                &copy; 2025 Cookie Craft Manager
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Script Animasi Cookie & Love -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const container = document.getElementById('falling-container');
+            const icons = ['bi-cookie', 'bi-heart-fill']; 
+
+            for (let i = 0; i < 20; i++) {
+                const div = document.createElement('div');
+                div.classList.add('falling-item');
+                
+                const randomIcon = icons[Math.floor(Math.random() * icons.length)];
+                div.innerHTML = `<i class="bi ${randomIcon}"></i>`;
+                
+                if (randomIcon === 'bi-cookie') {
+                    const brownColors = ['#5D4037', '#8D6E63', '#A1887F'];
+                    div.style.color = brownColors[Math.floor(Math.random() * brownColors.length)];
+                } else {
+                    const pinkColors = ['#ec407a', '#f48fb1', '#ff80ab'];
+                    div.style.color = pinkColors[Math.floor(Math.random() * pinkColors.length)];
+                }
+                
+                div.style.fontSize = (Math.random() * 20 + 15) + 'px';
+                div.style.left = Math.random() * 100 + 'vw';
+                div.style.animationDuration = (Math.random() * 5 + 6) + 's';
+                div.style.animationDelay = Math.random() * 5 + 's';
+                
+                container.appendChild(div);
+            }
+        });
+    </script>
+</div>
+</body>
+</html>

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Form Cookie</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container mt-5">
+    <div class="card mx-auto" style="max-width: 600px;">
+        <div class="card-header bg-primary text-white">
+            <h4 th:text="${cookie.id == null ? 'Tambah Kue Baru' : 'Edit Kue'}">Form</h4>
+        </div>
+        <div class="card-body">
+            <form th:action="@{/cookies/save}" method="post" enctype="multipart/form-data" th:object="${cookie}">
+                <input type="hidden" th:field="*{id}">
+                <input type="hidden" th:field="*{soldCount}">
+                <!-- Simpan path gambar lama jika tidak diubah -->
+                <input type="hidden" th:field="*{imagePath}"> 
+
+                <div class="mb-3">
+                    <label>Nama Kue</label>
+                    <input type="text" th:field="*{name}" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label>Varian Rasa</label>
+                    <input type="text" th:field="*{flavor}" class="form-control" required>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label>Harga (Rp)</label>
+                        <input type="number" th:field="*{price}" class="form-control" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label>Stok Awal</label>
+                        <input type="number" th:field="*{stock}" class="form-control" required>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label>Gambar Kue</label>
+                    <input type="file" name="imageFile" class="form-control" accept="image/*">
+                    <small class="text-muted" th:if="${cookie.imagePath != null}">Biarkan kosong jika tidak ingin mengubah gambar.</small>
+                </div>
+
+                <button type="submit" class="btn btn-success w-100">Simpan Data</button>
+                <a href="/cookies" class="btn btn-secondary w-100 mt-2">Batal</a>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>
