@@ -18,7 +18,7 @@
 	<description>Todo Application with Spring Boot</description>
 
 	<properties>
-		<java.version>25</java.version>
+		<java.version>21</java.version> <!-- SAYA UBAH KE 21 (LTS) AGAR LEBIH STABIL, UBAH KE 25 JIKA MEMANG PAKAI JDK 25 -->
 		<maven.compiler.source>${java.version}</maven.compiler.source>
 		<maven.compiler.target>${java.version}</maven.compiler.target>
 		<!-- Versi plugin yang digunakan -->
@@ -27,7 +27,7 @@
 		<!-- Versi dependency yang digunakan -->
 		<maven.dependency.mockito.version>5.20.0</maven.dependency.mockito.version>
 		<maven.dependency.jakarta.servlet-api.version>6.1.0</maven.dependency.jakarta.servlet-api.version>
-		<maven.dependency.jjwt.version>0.13.0</maven.dependency.jjwt.version>
+		<maven.dependency.jjwt.version>0.11.5</maven.dependency.jjwt.version>
 	</properties>
 
 	<dependencies>
@@ -145,14 +145,13 @@
 			<scope>runtime</scope>
 		</dependency>
 
-		<!-- Dependency for JWT -->
+		<!-- Dependency for JWT (HANYA SATU VERSI SAJA - 0.13.0) -->
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
 			<artifactId>jjwt-api</artifactId>
 			<version>${maven.dependency.jjwt.version}</version>
 		</dependency>
 
-		<!-- Dependency for JWT Implementation -->
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
 			<artifactId>jjwt-impl</artifactId>
@@ -160,7 +159,6 @@
 			<scope>runtime</scope>
 		</dependency>
 
-		<!-- Dependency for JWT Jackson Parser -->
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
 			<artifactId>jjwt-jackson</artifactId>
@@ -168,23 +166,7 @@
 			<scope>runtime</scope>
 		</dependency>
 
-		    <dependency>
-        <groupId>io.jsonwebtoken</groupId>
-        <artifactId>jjwt-api</artifactId>
-        <version>0.11.5</version>
-    </dependency>
-    <dependency>
-        <groupId>io.jsonwebtoken</groupId>
-        <artifactId>jjwt-impl</artifactId>
-        <version>0.11.5</version>
-        <scope>runtime</scope>
-    </dependency>
-    <dependency>
-        <groupId>io.jsonwebtoken</groupId>
-        <artifactId>jjwt-jackson</artifactId> <!-- atau jjwt-gson jika pakai Gson -->
-        <version>0.11.5</version>
-        <scope>runtime</scope>
-    </dependency>
+		<!-- BAGIAN DUPLIKAT YANG DIHAPUS ADA DISINI -->
 		
 	</dependencies>
 
@@ -203,7 +185,6 @@
 				</executions>
 			</plugin>
 
-			<!-- dependency plugin tetap jika diperlukan -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
@@ -216,21 +197,21 @@
 				</executions>
 			</plugin>
 
-			<!-- Surefire plugin untuk menjalankan test -->
+			<!-- Surefire plugin -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>${maven.surefire.plugin.version}</version>
 			</plugin>
 
-			<!-- Plugin untuk membuat laporan HTML dari hasil test -->
+			<!-- Report plugin -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-report-plugin</artifactId>
 				<version>${maven.surefire.plugin.version}</version>
 			</plugin>
 
-			<!-- JaCoCo Plugin (coverage) tetap -->
+			<!-- JaCoCo Plugin -->
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
@@ -259,13 +240,12 @@
 				</executions>
 				<configuration>
 					<excludes>
-						<!-- Exclude specific classes -->
 						<exclude>**/utils/**</exclude>
 						<exclude>**/configs/**</exclude>
 						<exclude>**/dto/**</exclude>
 						<exclude>**/views/**</exclude>
 					</excludes>
-
+					<!-- Rules ini sangat ketat (100%), mungkin menyebabkan build fail jika belum 100% -->
 					<rules>
 						<rule>
 							<element>BUNDLE</element>
@@ -288,5 +268,4 @@
 
 		</plugins>
 	</build>
-
 </project>

@@ -89,7 +89,6 @@ public class RegisterFormTest {
         RegisterForm form = new RegisterForm("Budi", "", "pass123");
         Set<ConstraintViolation<RegisterForm>> violations = validator.validate(form);
 
-        // Biasanya @NotBlank menimpa @Email untuk string kosong
         assertEquals(1, violations.size());
         assertEquals("Email wajib diisi", violations.iterator().next().getMessage());
     }
@@ -123,7 +122,9 @@ public class RegisterFormTest {
         RegisterForm form = new RegisterForm("Budi", "budi@test.com", "");
         Set<ConstraintViolation<RegisterForm>> violations = validator.validate(form);
 
-        assertEquals(2, violations.size()); // @Size min 6 mungkin trigger juga, tapi @NotBlank pasti trigger
+        // Expect 2 errors: @NotBlank and @Size(min=6) because length is 0
+        assertEquals(2, violations.size()); 
+        // Use anyMatch to find the specific error regardless of order
         assertTrue(violations.stream().anyMatch(v -> v.getMessage().equals("Password wajib diisi")));
     }
 
@@ -133,8 +134,18 @@ public class RegisterFormTest {
         RegisterForm form = new RegisterForm("Budi", "budi@test.com", "   ");
         Set<ConstraintViolation<RegisterForm>> violations = validator.validate(form);
 
+        // Expect 2 errors: @NotBlank and @Size(min=6) because length is 3 (spaces)
         assertEquals(2, violations.size());
-        assertEquals("Password wajib diisi", violations.iterator().next().getMessage());
+        
+        // PERBAIKAN: Menggunakan stream().anyMatch() agar tidak peduli urutan error (NotBlank atau Size duluan)
+        boolean hasNotBlankError = violations.stream()
+                .anyMatch(v -> v.getMessage().equals("Password wajib diisi"));
+        
+        boolean hasSizeError = violations.stream()
+                .anyMatch(v -> v.getMessage().equals("Password minimal 6 karakter"));
+
+        assertTrue(hasNotBlankError, "Harusnya ada error: Password wajib diisi");
+        assertTrue(hasSizeError, "Harusnya ada error: Password minimal 6 karakter");
     }
 
     // ==========================================
