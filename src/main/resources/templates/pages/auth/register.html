@@ -1,604 +1,164 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout/main}">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Daftar - Cookie Craft Manager</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daftar - Lapar.id</title>
     
-    <!-- Tambahkan font baru yang lebih imut -->
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700&family=Fredoka+One&family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
-    
-    <!-- Tambahkan animate.css untuk animasi -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
-    
+    <!-- Google Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <style>
-        /* CSS Kustom untuk tema soft dan imut */
+        /* CSS Variable sama dengan Login Page */
         :root {
-            --soft-pink: #ffd6e7;
-            --light-pink: #ffb8d9;
-            --pastel-purple: #d8b4fe;
-            --soft-blue: #a5d8ff;
-            --light-yellow: #fff9c4;
-            --light-green: #c8f7c5;
-            --shadow-soft: 0 8px 32px rgba(255, 182, 193, 0.1);
+            --primary: #D32F2F;
+            --primary-dark: #b71c1c;
+            --dark: #1e272e;
+            --light-bg: #f4f6f8;
+            --input-bg: #f1f2f6;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        
+        body { 
+            background-color: var(--light-bg); 
+            display: flex; justify-content: center; align-items: center; 
+            min-height: 100vh; padding: 20px;
         }
         
-        body {
-            font-family: 'Nunito', 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #fff5f7 0%, #f8f7ff 100%);
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
-        
-        .register-container {
-            position: relative;
-            overflow: hidden;
-        }
-        
-        /* Floating animation */
-        .floating-shape {
-            position: absolute;
-            border-radius: 50%;
-            animation: float 6s ease-in-out infinite;
-            z-index: 1;
-            opacity: 0.6;
-        }
-        
-        .floating-shape:nth-child(1) {
-            width: 50px;
-            height: 50px;
-            background: linear-gradient(135deg, #ffb8d9 0%, #ff9ec0 100%);
-            top: 10%;
-            left: 10%;
-            animation-delay: 0s;
-        }
-        
-        .floating-shape:nth-child(2) {
-            width: 35px;
-            height: 35px;
-            background: linear-gradient(135deg, #d8b4fe 0%, #c084fc 100%);
-            top: 70%;
-            left: 85%;
-            animation-delay: 2s;
-        }
-        
-        .floating-shape:nth-child(3) {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, #a5d8ff 0%, #60a5fa 100%);
-            top: 85%;
-            left: 15%;
-            animation-delay: 4s;
-        }
-        
-        .floating-shape:nth-child(4) {
-            width: 30px;
-            height: 30px;
-            background: linear-gradient(135deg, #c8f7c5 0%, #86efac 100%);
-            top: 20%;
-            left: 80%;
-            animation-delay: 1s;
-        }
-        
-        @keyframes float {
-            0% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-20px) rotate(5deg); }
-            100% { transform: translateY(0px) rotate(0deg); }
-        }
-        
-        /* Styling card */
         .register-card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
+            background: white; 
+            padding: 40px; 
             border-radius: 24px;
-            border: none;
-            box-shadow: var(--shadow-soft), 0 4px 6px rgba(0, 0, 0, 0.05);
-            position: relative;
-            z-index: 2;
-            overflow: hidden;
-            transition: transform 0.3s ease;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.08);
+            width: 100%; 
+            max-width: 420px; 
+            text-align: center;
+        }
+
+        .brand-logo {
+            font-size: 26px; font-weight: 800; color: var(--primary);
+            margin-bottom: 10px; display: inline-block;
+        }
+        .brand-logo i { background: var(--primary); color: white; padding: 7px; border-radius: 8px; font-size: 16px; margin-right: 5px; }
+
+        h2 { color: var(--dark); margin-bottom: 5px; font-weight: 700; font-size: 1.5rem; }
+        p.subtitle { color: #7f8c8d; margin-bottom: 25px; font-size: 0.9rem; }
+
+        /* Form Styling */
+        .form-group { margin-bottom: 15px; text-align: left; }
+        
+        .form-group label { 
+            display: block; margin-bottom: 8px; font-weight: 500; 
+            color: var(--dark); font-size: 0.85rem; margin-left: 5px;
         }
         
-        .register-card:hover {
-            transform: translateY(-5px);
-        }
+        .input-wrapper { position: relative; }
         
-        /* Header dengan animasi */
-        .register-header {
-            position: relative;
-            padding: 1.5rem;
-            background: linear-gradient(135deg, var(--soft-blue) 0%, var(--pastel-purple) 100%);
-            border-radius: 20px 20px 0 0;
-            margin-bottom: 1.5rem;
+        .input-wrapper i {
+            position: absolute; left: 15px; top: 50%; transform: translateY(-50%);
+            color: #95a5a6; font-size: 1rem; transition: 0.3s;
         }
-        
-        .register-icon-container {
-            background: rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            width: 100px;
-            height: 100px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto;
-            animation: pulse 2s infinite alternate;
-            box-shadow: 0 8px 20px rgba(168, 85, 247, 0.2);
-            border: 3px solid rgba(255, 255, 255, 0.5);
+
+        input {
+            width: 100%; padding: 12px 15px 12px 45px; /* Padding kiri untuk ikon */
+            border: 2px solid transparent; background: var(--input-bg);
+            border-radius: 12px; font-size: 0.95rem; transition: 0.3s; outline: none; color: var(--dark);
         }
-        
-        @keyframes pulse {
-            0% { transform: scale(1); box-shadow: 0 8px 20px rgba(168, 85, 247, 0.2); }
-            100% { transform: scale(1.05); box-shadow: 0 12px 25px rgba(168, 85, 247, 0.3); }
+
+        input:focus { 
+            border-color: var(--primary); background: white; 
+            box-shadow: 0 5px 15px rgba(211, 47, 47, 0.1); 
         }
-        
-        .register-icon {
-            font-size: 3rem;
-            color: #8b5cf6;
-            filter: drop-shadow(0 4px 8px rgba(139, 92, 246, 0.3));
+        input:focus + i { color: var(--primary); }
+
+        button {
+            width: 100%; padding: 14px; 
+            background: var(--primary); color: white;
+            border: none; border-radius: 50px;
+            font-size: 1rem; font-weight: 600;
+            cursor: pointer; transition: 0.3s; margin-top: 15px;
+            box-shadow: 0 5px 15px rgba(211, 47, 47, 0.2);
         }
-        
-        .register-title {
-            font-family: 'Fredoka One', cursive;
-            font-weight: 400;
-            color: #7c3aed;
-            text-shadow: 2px 2px 0px rgba(255, 255, 255, 0.8);
-            font-size: 2.2rem;
-            margin-top: 1rem;
-            letter-spacing: 0.5px;
+        button:hover { 
+            background: var(--primary-dark); 
+            transform: translateY(-2px); 
+            box-shadow: 0 8px 20px rgba(211, 47, 47, 0.3); 
         }
-        
-        .register-subtitle {
-            color: #888;
-            font-weight: 300;
-            font-size: 1.1rem;
-            margin-top: 0.5rem;
-            animation: colorChange 5s infinite alternate;
-        }
-        
-        @keyframes colorChange {
-            0% { color: #888; }
-            100% { color: #a78bfa; }
-        }
-        
-        /* Form styling */
-        .form-floating label {
-            color: #888;
-            font-weight: 400;
-        }
-        
-        .form-control {
-            border-radius: 12px;
-            border: 2px solid #f0f0f0;
-            padding: 1rem 1.25rem;
-            font-size: 1rem;
-            transition: all 0.3s;
-            background-color: #fefefe;
-        }
-        
-        .form-control:focus {
-            border-color: #a78bfa;
-            box-shadow: 0 0 0 0.25rem rgba(168, 139, 250, 0.25);
-        }
-        
-        .form-control.is-invalid {
-            border-color: #ff6b6b;
-        }
-        
-        /* Tombol register */
-        .register-btn {
-            background: linear-gradient(135deg, #a78bfa 0%, #7c3aed 100%);
-            border: none;
-            border-radius: 50px;
-            padding: 0.9rem;
-            font-weight: 600;
-            font-size: 1.1rem;
-            letter-spacing: 0.5px;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 4px 15px rgba(124, 58, 237, 0.3);
-        }
-        
-        .register-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(124, 58, 237, 0.4);
-            background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
-        }
-        
-        .register-btn:active {
-            transform: translateY(-1px);
-        }
-        
-        /* Animasi ripple effect */
-        .register-btn::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 5px;
-            height: 5px;
-            background: rgba(255, 255, 255, 0.5);
-            opacity: 0;
-            border-radius: 100%;
-            transform: scale(1, 1) translate(-50%);
-            transform-origin: 50% 50%;
-        }
-        
-        .register-btn:focus:not(:active)::after {
-            animation: ripple 1s ease-out;
-        }
-        
-        @keyframes ripple {
-            0% {
-                transform: scale(0, 0);
-                opacity: 0.5;
-            }
-            100% {
-                transform: scale(20, 20);
-                opacity: 0;
-            }
-        }
-        
-        /* Link styling */
-        .login-link {
-            color: #8b5cf6;
-            font-weight: 600;
-            text-decoration: none;
-            position: relative;
-            padding-bottom: 2px;
-            transition: all 0.3s;
-        }
-        
-        .login-link::after {
-            content: '';
-            position: absolute;
-            width: 0;
-            height: 2px;
-            bottom: 0;
-            left: 0;
-            background-color: #8b5cf6;
-            transition: width 0.3s;
-            border-radius: 2px;
-        }
-        
-        .login-link:hover {
-            color: #6d28d9;
-        }
-        
-        .login-link:hover::after {
-            width: 100%;
-        }
-        
-        /* Alert styling */
-        .alert {
-            border-radius: 12px;
-            border: none;
-            font-weight: 400;
-            animation: slideDown 0.5s ease-out;
-        }
-        
-        @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        .alert-danger {
-            background-color: rgba(255, 107, 107, 0.1);
-            color: #ff6b6b;
-            border-left: 4px solid #ff6b6b;
-        }
-        
-        /* Responsive adjustments */
-        @media (max-width: 768px) {
-            .register-title {
-                font-size: 1.8rem;
-            }
-            
-            .register-icon-container {
-                width: 80px;
-                height: 80px;
-            }
-            
-            .register-icon {
-                font-size: 2.5rem;
-            }
-            
-            .register-card {
-                margin: 1rem;
-            }
-        }
-        
-        /* Animasi untuk form input */
-        .form-floating {
-            animation: slideUp 0.5s ease forwards;
-            opacity: 0;
-            transform: translateY(20px);
-        }
-        
-        .form-floating:nth-child(1) {
-            animation-delay: 0.2s;
-        }
-        
-        .form-floating:nth-child(2) {
-            animation-delay: 0.4s;
-        }
-        
-        .form-floating:nth-child(3) {
-            animation-delay: 0.6s;
-        }
-        
-        @keyframes slideUp {
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        /* Efek highlight pada input yang sedang aktif */
-        .form-floating.focused label {
-            color: #8b5cf6;
-            transform: scale(0.85) translateY(-0.5rem) translateX(0.15rem);
-        }
-        
-        /* Progress indicator (opsional untuk multi-step form) */
-        .form-progress {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 2rem;
-            position: relative;
-        }
-        
-        .form-progress::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 10%;
-            right: 10%;
-            height: 4px;
-            background: #e9ecef;
-            z-index: 1;
-            border-radius: 2px;
-        }
-        
-        .progress-step {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: white;
-            border: 3px solid #e9ecef;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            color: #adb5bd;
-            position: relative;
-            z-index: 2;
-            transition: all 0.3s;
-        }
-        
-        .progress-step.active {
-            border-color: #8b5cf6;
-            color: #8b5cf6;
-            background: white;
-            box-shadow: 0 0 0 5px rgba(139, 92, 246, 0.1);
+
+        /* Footer Links */
+        .auth-footer { margin-top: 20px; font-size: 0.9rem; color: #7f8c8d; }
+        .auth-footer a { color: var(--primary); text-decoration: none; font-weight: 600; transition: 0.2s; }
+        .auth-footer a:hover { text-decoration: underline; }
+
+        .back-link { margin-top: 15px; display: block; font-size: 0.85rem; color: #95a5a6; text-decoration: none; }
+        .back-link:hover { color: var(--dark); }
+
+        /* Alert Error */
+        .alert-error {
+            background: #ffebee; color: #c62828; padding: 12px; 
+            border-radius: 12px; margin-bottom: 20px; font-size: 0.85rem;
+            border: 1px solid #ffcdd2; display: flex; align-items: center; gap: 10px;
+            text-align: left;
         }
     </style>
 </head>
 <body>
-<div layout:fragment="content">
-    <div class="row justify-content-center mt-5 align-items-center register-container" style="min-height: 80vh;">
-        <!-- Floating shapes decor -->
-        <div class="floating-shape"></div>
-        <div class="floating-shape"></div>
-        <div class="floating-shape"></div>
-        <div class="floating-shape"></div>
-        
-        <div class="col-md-5 col-lg-4">
-            <div class="card shadow-lg border-0 rounded-4 register-card animate__animated animate__fadeInUp">
-                <div class="register-header text-center">
-                    <!-- Ikon Register dengan animasi -->
-                    <div class="register-icon-container">
-                        <i class="bi bi-person-plus-fill register-icon"></i>
-                    </div>
-                    <h3 class="mt-3 fw-bold register-title">Buat Akun Baru</h3>
-                    <p class="register-subtitle">Mulai kelola stok kuemu hari ini</p>
-                </div>
-                
-                <div class="card-body p-5">
-                    <form th:action="@{/auth/register/post}" method="post" th:object="${registerForm}">
-                        
-                        <!-- Alert Error Global -->
-                        <div th:if="${#fields.hasGlobalErrors()}" class="alert alert-danger d-flex align-items-center small animate__animated animate__shakeX" role="alert">
-                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                            <div>
-                                <span th:each="err : ${#fields.globalErrors()}" th:text="${err}"></span>
-                            </div>
-                        </div>
 
-                        <!-- Nama Lengkap -->
-                        <div class="form-floating mb-3">
-                            <input type="text" class="form-control" id="name" th:field="*{name}"
-                                   th:classappend="${#fields.hasErrors('name')} ? 'is-invalid'" placeholder="Nama Lengkap">
-                            <label for="name">
-                                <i class="bi bi-person-circle me-2"></i>Nama Lengkap
-                            </label>
-                            <div class="invalid-feedback" th:errors="*{name}"></div>
-                        </div>
+    <div class="register-card">
+        <!-- Logo -->
+        <a href="/" style="text-decoration: none;">
+            <div class="brand-logo"><i class="fas fa-utensils"></i> Lapar.id</div>
+        </a>
+        <h2>Gabung Sekarang</h2>
+        <p class="subtitle">Nikmati ribuan menu lezat dalam satu aplikasi.</p>
 
-                        <!-- Email -->
-                        <div class="form-floating mb-3">
-                            <input type="email" class="form-control" id="email" th:field="*{email}"
-                                   th:classappend="${#fields.hasErrors('email')} ? 'is-invalid'" placeholder="Email">
-                            <label for="email">
-                                <i class="bi bi-envelope-heart me-2"></i>Alamat Email
-                            </label>
-                            <div class="invalid-feedback" th:errors="*{email}"></div>
-                        </div>
-
-                        <!-- Password -->
-                        <div class="form-floating mb-3">
-                            <input type="password" class="form-control" id="password" th:field="*{password}"
-                                   th:classappend="${#fields.hasErrors('password')} ? 'is-invalid'" placeholder="Kata Sandi">
-                            <label for="password">
-                                <i class="bi bi-key-fill me-2"></i>Kata Sandi
-                            </label>
-                            <div class="invalid-feedback" th:errors="*{password}"></div>
-                        </div>
-
-                        <!-- Tombol Submit -->
-                        <div class="d-grid gap-2 mt-4">
-                            <button type="submit" class="btn btn-primary btn-lg fw-bold register-btn">
-                                <i class="bi bi-hearts me-2"></i>Daftar Akun
-                            </button>
-                        </div>
-                    </form>
-
-                    <hr class="my-4 text-muted opacity-25">
-                    
-                    <div class="text-center">
-                        <span class="text-muted small">Sudah punya akun?</span> 
-                        <a th:href="@{/auth/login}" class="text-decoration-none fw-bold ms-1 login-link">
-                            <i class="bi bi-box-arrow-in-right me-1"></i>Masuk di sini
-                        </a>
-                    </div>
-                    
-                    <!-- Info tambahan untuk keamanan -->
-                    <div class="mt-4 p-3 bg-light rounded text-center small">
-                        <i class="bi bi-shield-check text-success me-1"></i>
-                        <span class="text-muted">Data Anda terlindungi dengan aman</span>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Footer Kecil -->
-            <div class="text-center mt-4 text-muted small">
-                <i class="bi bi-cookie me-1"></i>&copy; 2025 Cookie Craft Manager
+        <!-- Notifikasi Error -->
+        <div th:if="${param.error}" class="alert-error">
+            <i class="fas fa-exclamation-triangle"></i>
+            <div>
+                <!-- Menggunakan text sederhana agar lebih rapi -->
+                <span th:if="${param.error} == 'email_exist'">Email sudah terdaftar! Gunakan yang lain.</span>
+                <span th:if="${param.error} != 'email_exist'">Terjadi kesalahan server atau input tidak valid.</span>
             </div>
         </div>
-    </div>
-</div>
 
-<!-- Script untuk animasi tambahan -->
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Tambahkan efek hover pada input fields
-        const inputs = document.querySelectorAll('.form-control');
-        inputs.forEach(input => {
-            input.addEventListener('focus', function() {
-                this.parentElement.classList.add('focused');
-            });
+        <form th:action="@{/auth/register/save}" method="post" th:object="${registerForm}">
             
-            input.addEventListener('blur', function() {
-                if (this.value === '') {
-                    this.parentElement.classList.remove('focused');
-                }
-            });
-        });
-        
-        // Tambahkan efek pada tombol saat diklik
-        const registerBtn = document.querySelector('.register-btn');
-        if (registerBtn) {
-            registerBtn.addEventListener('click', function(e) {
-                // Efek ripple
-                let ripple = document.createElement('span');
-                let rect = this.getBoundingClientRect();
-                let size = Math.max(rect.width, rect.height);
-                let x = e.clientX - rect.left - size/2;
-                let y = e.clientY - rect.top - size/2;
-                
-                ripple.style.cssText = `
-                    position: absolute;
-                    border-radius: 50%;
-                    background: rgba(255, 255, 255, 0.7);
-                    transform: scale(0);
-                    animation: ripple-animation 0.6s linear;
-                    width: ${size}px;
-                    height: ${size}px;
-                    top: ${y}px;
-                    left: ${x}px;
-                `;
-                
-                this.appendChild(ripple);
-                
-                // Hapus ripple setelah animasi selesai
-                setTimeout(() => {
-                    ripple.remove();
-                }, 600);
-            });
-        }
-        
-        // Animasi masuk untuk elemen card
-        const card = document.querySelector('.register-card');
-        if (card) {
-            card.style.opacity = '0';
-            card.style.transform = 'translateY(20px)';
-            
-            setTimeout(() => {
-                card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
-                card.style.opacity = '1';
-                card.style.transform = 'translateY(0)';
-            }, 100);
-        }
-        
-        // Validasi password strength (opsional)
-        const passwordInput = document.getElementById('password');
-        if (passwordInput) {
-            passwordInput.addEventListener('input', function() {
-                const password = this.value;
-                const strengthIndicator = document.createElement('div');
-                strengthIndicator.className = 'password-strength mt-2';
-                
-                let strength = 0;
-                if (password.length >= 8) strength++;
-                if (/[A-Z]/.test(password)) strength++;
-                if (/[0-9]/.test(password)) strength++;
-                if (/[^A-Za-z0-9]/.test(password)) strength++;
-                
-                const strengthText = ['Sangat Lemah', 'Lemah', 'Cukup', 'Kuat'];
-                const strengthColors = ['#ff6b6b', '#ffa94d', '#51cf66', '#2b8a3e'];
-                
-                if (password.length > 0) {
-                    if (!this.nextElementSibling.classList.contains('password-strength')) {
-                        this.parentNode.appendChild(strengthIndicator);
-                    }
-                    
-                    strengthIndicator.innerHTML = `
-                        <div class="progress" style="height: 5px;">
-                            <div class="progress-bar" role="progressbar" 
-                                 style="width: ${strength * 25}%; background-color: ${strengthColors[strength]}">
-                            </div>
-                        </div>
-                        <small class="d-block mt-1" style="color: ${strengthColors[strength]}">
-                            Kekuatan: ${strengthText[strength]}
-                        </small>
-                    `;
-                } else {
-                    const existingIndicator = this.parentNode.querySelector('.password-strength');
-                    if (existingIndicator) {
-                        existingIndicator.remove();
-                    }
-                }
-            });
-        }
-        
-        // Tambahkan style untuk animasi ripple
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes ripple-animation {
-                to {
-                    transform: scale(4);
-                    opacity: 0;
-                }
-            }
-        `;
-        document.head.appendChild(style);
-    });
-</script>
+            <div class="form-group">
+                <label>Nama Lengkap</label>
+                <div class="input-wrapper">
+                    <input type="text" th:field="*{name}" placeholder="Contoh: Budi Santoso" required>
+                    <i class="fas fa-user"></i> <!-- Ikon User -->
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Email</label>
+                <div class="input-wrapper">
+                    <input type="email" th:field="*{email}" placeholder="nama@email.com" required>
+                    <i class="fas fa-envelope"></i> <!-- Ikon Amplop -->
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Password</label>
+                <div class="input-wrapper">
+                    <input type="password" th:field="*{password}" placeholder="Minimal 6 karakter" required>
+                    <i class="fas fa-lock"></i> <!-- Ikon Gembok -->
+                </div>
+            </div>
+
+            <button type="submit">Daftar Sekarang</button>
+        </form>
+
+        <div class="auth-footer">
+            Sudah punya akun? <a href="/auth/login">Login di sini</a>
+        </div>
+
+        <a href="/" class="back-link">&larr; Kembali ke Beranda</a>
+    </div>
+
 </body>
-</html>
+</html>~

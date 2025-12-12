@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" layout:decorate="~{layout/main}">
+<head>
+    <title>Laporan Penjualan</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<div layout:fragment="content" class="container">
+    <div class="card border-0 shadow-lg rounded-4 p-4 mx-auto" style="max-width: 800px;">
+        <h3 class="fw-bold text-center mb-4">📊 Statistik Penjualan</h3>
+        <canvas id="salesChart"></canvas>
+    </div>
+    <script>
+        fetch('/dashboard/api/chart-data').then(r=>r.json()).then(d=>{
+            new Chart(document.getElementById('salesChart'), {
+                type: 'bar',
+                data: {
+                    labels: d.labels,
+                    datasets: [{
+                        label: 'Terjual (Porsi)',
+                        data: d.data,
+                        backgroundColor: '#FF5500'
+                    }]
+                }
+            });
+        });
+    </script>
+</div>
+</body>
+</html>

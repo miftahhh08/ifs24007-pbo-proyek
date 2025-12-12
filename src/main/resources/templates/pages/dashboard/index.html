@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" layout:decorate="~{layout/main}">
+<head>
+    <title>Kelola Toko</title>
+    <style>
+        .dashboard-header {
+            background: linear-gradient(135deg, #D32F2F, #ff5252);
+            padding: 40px; border-radius: 20px; color: white;
+            display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 10px 20px rgba(211, 47, 47, 0.2); margin-bottom: 30px;
+        }
+        .table-container { background: white; border-radius: 20px; padding: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        
+        .custom-table { width: 100%; border-collapse: collapse; }
+        .custom-table th { text-align: left; padding: 20px; color: #7f8c8d; font-size: 0.9rem; border-bottom: 2px solid #f1f2f6; }
+        .custom-table td { padding: 20px; border-bottom: 1px solid #f1f2f6; vertical-align: middle; }
+        
+        .btn-action { padding: 8px 12px; border-radius: 10px; color: white; margin-right: 5px; font-size: 0.9rem; border: none; cursor: pointer; transition: 0.3s; }
+        .btn-action:hover { transform: translateY(-2px); opacity: 0.9; }
+
+        .btn-detail { background: #3498db; } /* Biru untuk Detail */
+        .btn-edit { background: #f1c40f; }   /* Kuning untuk Edit */
+        .btn-delete { background: #e74c3c; } /* Merah untuk Hapus */
+    </style>
+</head>
+<body>
+<div layout:fragment="content" class="container" style="padding: 40px 5%;">
+
+    <!-- Header Dashboard -->
+    <div class="dashboard-header">
+        <div>
+            <h2 style="font-weight: 800; margin-bottom: 5px;">Dapur Toko</h2>
+            <p style="opacity: 0.9;">Kelola semua menu makananmu di sini.</p>
+        </div>
+        <a href="/dashboard/add" style="background: white; color: #D32F2F; padding: 12px 25px; border-radius: 50px; font-weight: 700; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+            <i class="fas fa-plus"></i> Tambah Menu
+        </a>
+    </div>
+
+    <!-- Tabel Data -->
+    <div class="table-container">
+        <table class="custom-table">
+            <thead>
+                <tr>
+                    <th>Foto</th>
+                    <th>Nama Menu</th>
+                    <th>Harga</th>
+                    <th>Deskripsi</th>
+                    <th style="text-align: center; min-width: 150px;">Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="p : ${products}">
+                    <td>
+                        <img th:if="${p.image}" th:src="@{'/uploads/' + ${p.image}}" style="width: 60px; height: 60px; border-radius: 10px; object-fit: cover;">
+                        <div th:unless="${p.image}" style="width: 60px; height: 60px; background: #eee; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #aaa;">
+                            <i class="fas fa-image"></i>
+                        </div>
+                    </td>
+                    <td>
+                        <strong th:text="${p.name}" style="font-size: 1.1rem; color: #2d3436;">Nama</strong>
+                    </td>
+                    <td style="color: #D32F2F; font-weight: 700;" th:text="'Rp ' + ${p.price}">Rp 0</td>
+                    <td style="color: #636e72; font-size: 0.9rem; max-width: 200px;" th:text="${p.description}">Desc</td>
+                    
+                    <!-- KOLOM AKSI (Sudah Ada Tombol Detail) -->
+                    <td style="text-align: center;">
+                        <!-- 1. Tombol Detail (Biru) -->
+                        <a th:href="@{/dashboard/detail/{id}(id=${p.id})}" class="btn-action btn-detail" title="Lihat Detail">
+                            <i class="fas fa-eye"></i>
+                        </a>
+
+                        <!-- 2. Tombol Edit (Kuning) -->
+                        <a th:href="@{/dashboard/edit/{id}(id=${p.id})}" class="btn-action btn-edit" title="Edit Data">
+                            <i class="fas fa-edit"></i>
+                        </a>
+
+                        <!-- 3. Tombol Hapus (Merah) -->
+                        <a th:href="@{/dashboard/delete/{id}(id=${p.id})}" class="btn-action btn-delete" title="Hapus Data" onclick="return confirm('Yakin hapus menu ini?');">
+                            <i class="fas fa-trash"></i>
+                        </a>
+                    </td>
+                </tr>
+                
+                <!-- Jika Kosong -->
+                <tr th:if="${products.empty}">
+                    <td colspan="5" style="text-align: center; padding: 40px; color: #aaa;">
+                        <i class="fas fa-box-open" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                        <p>Belum ada menu. Yuk tambah sekarang!</p>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>
+</body>
+</html>

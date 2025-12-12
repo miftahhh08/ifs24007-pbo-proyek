@@ -1,68 +1,58 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout/main}">
-<head><title>Jajanan - Yummy Market</title></head>
+<html xmlns:th="http://www.thymeleaf.org" layout:decorate="~{layout/main}">
+<head>
+    <title>Jelajah Makanan</title>
+</head>
 <body>
-<div layout:fragment="content">
+<div layout:fragment="content" style="padding-bottom: 50px;">
 
-    <!-- Banner Sambutan -->
-    <div class="text-center mb-5 p-5 rounded-5" style="background: linear-gradient(135deg, #FF9A9E 0%, #FECFEF 100%); color: white; position: relative; overflow: hidden;">
-        <h1 class="display-4 fw-bold mb-2">Mau makan apa hari ini? 😋</h1>
-        <p class="fs-5 opacity-75">Temukan makanan lezat di sini.</p>
-        <div th:if="${userName}" class="badge bg-white text-danger rounded-pill px-4 py-2 mt-2 shadow-sm">
-            Hai, <span th:text="${userName}">User</span>! Selamat Jajan 👋
-        </div>
+    <!-- HEADER CANTIK -->
+    <div style="background: linear-gradient(120deg, #D32F2F, #ff5252); padding: 60px 5%; color: white; margin-bottom: 40px;">
+        <h1 style="font-weight: 800; font-size: 2.5rem;">Perut Kenyang, Hati Senang 🍔</h1>
+        <p style="font-size: 1.1rem; opacity: 0.9;">Temukan jajanan favoritmu hari ini.</p>
     </div>
 
-    <!-- Grid Produk -->
-    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
-        
-        <!-- Pesan Jika Kosong -->
-        <div th:if="${cookies.empty}" class="col-12 text-center py-5">
-            <span style="font-size: 60px;">🍽️</span>
-            <h4 class="mt-3 text-muted">Belum ada makanan dijual.</h4>
-            <p class="text-muted">Penjual belum restock nih.</p>
-        </div>
-
-        <!-- Loop Kartu Produk -->
-        <!-- PERHATIKAN: th:each="cookie : ${cookies}" -->
-        <div class="col" th:each="cookie : ${cookies}">
-            <div class="card card-custom h-100 position-relative">
-                
-                <!-- Badge Stok (Menggunakan Safety Check ?:) -->
-                <span class="position-absolute top-0 end-0 m-3 badge rounded-pill shadow-sm"
-                      th:classappend="${(cookie.stock ?: 0) > 0} ? 'bg-success' : 'bg-secondary'"
-                      th:text="${(cookie.stock ?: 0) > 0} ? 'Ready' : 'Habis'">Ready</span>
-
+    <!-- LIST MAKANAN -->
+    <div class="container" style="padding: 0 5%;">
+        <div class="row" style="display: flex; flex-wrap: wrap; gap: 20px;">
+            
+            <!-- Loop Produk -->
+            <div th:each="p : ${products}" style="flex: 0 0 280px; background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.08); transition: 0.3s;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
                 <!-- Gambar -->
-                <div style="height: 200px; background: #FFF0F0; display: flex; align-items: center; justify-content: center; overflow: hidden;">
-                    <img th:if="${cookie.imagePath != null}" th:src="@{'/uploads/' + ${cookie.imagePath}}" style="width: 100%; height: 100%; object-fit: cover;">
-                    <span th:if="${cookie.imagePath == null}" style="font-size: 4rem;">🍱</span>
-                </div>
-
-                <div class="card-body d-flex flex-column text-center">
-                    <h5 class="fw-bold mb-1 text-dark" th:text="${cookie.name}">Nama Menu</h5>
-                    <small class="text-muted mb-3" th:text="${cookie.flavor}">Varian</small>
-                    
-                    <h4 class="text-danger fw-bold mb-3" th:text="'Rp ' + ${cookie.price}">Rp 0</h4>
-                    
-                    <div class="mt-auto">
-                        <!-- LOGIKA TOMBOL BELI -->
-                        
-                        <!-- 1. Jika Stok Ada (Pakai Form agar aman) -->
-                        <form th:if="${(cookie.stock ?: 0) > 0}" th:action="@{/shop/buy/{id}(id=${cookie.id})}" method="post" target="_blank">
-                            <button type="submit" class="btn btn-yummy w-100 rounded-pill" 
-                                    onclick="return confirm('Pesan menu ini ke WhatsApp?')">
-                                <i class="bi bi-whatsapp me-1"></i> Pesan
-                            </button>
-                        </form>
-
-                        <!-- 2. Jika Stok Habis -->
-                        <button th:if="${(cookie.stock ?: 0) <= 0}" class="btn btn-secondary w-100 rounded-pill" disabled>
-                            Sold Out
-                        </button>
+                <div style="height: 180px; width: 100%; position: relative;">
+                    <img th:if="${p.image}" th:src="@{'/uploads/' + ${p.image}}" style="width: 100%; height: 100%; object-fit: cover;">
+                    <div th:unless="${p.image}" style="width: 100%; height: 100%; background: #f1f2f6; display: flex; align-items: center; justify-content: center; color: #aaa;">
+                        <i class="fas fa-image" style="font-size: 2rem;"></i>
                     </div>
                 </div>
+
+                <div style="padding: 20px;">
+                    <h5 style="font-weight: 700; font-size: 1.1rem; margin-bottom: 5px;" th:text="${p.name}">Nama Menu</h5>
+                    <p style="color: #7f8c8d; font-size: 0.9rem; margin-bottom: 15px; height: 40px; overflow: hidden;" th:text="${p.description}">Deskripsi</p>
+                    
+                    <!-- GANTI BAGIAN TOMBOL PESAN DENGAN INI -->
+<div style="display: flex; justify-content: space-between; align-items: center;">
+    <span style="color: #D32F2F; font-weight: 700; font-size: 1.1rem;" th:text="'Rp ' + ${p.price}">Rp 0</span>
+    
+    <!-- PERBAIKAN: Ubah Button jadi Link (A) ke WhatsApp -->
+    <!-- Ganti 6281234567890 dengan nomor WA kamu/penjual -->
+    <a th:href="|https://wa.me/6281279062069?text=Halo%20Kak%20Miftahul%20Jannah%20Siregar!%0ASaya%20mau%20pesan%20di%20Bento%20Market:%0A%0A%20%20*Menu*:%20${p.name}%0A%20%20*Varian*:%20${p.description}%0A%20%20*Harga*:%20Rp%20${p.price}%0A%0AMohon%20diproses%20ya!|"
+   target="_blank"
+   style="background: #25D366; color: white; text-decoration: none; padding: 8px 20px; border-radius: 50px; font-size: 0.9rem; font-weight: 600; display: flex; align-items: center; gap: 5px; transition: 0.3s;"
+   onmouseover="this.style.transform='scale(1.05)'" 
+   onmouseout="this.style.transform='scale(1)'">
+   <i class="fab fa-whatsapp"></i> Pesan
+</a>
+</div>
+                </div>
             </div>
+
+            <!-- Pesan Kosong -->
+            <div th:if="${products.empty}" style="width: 100%; text-align: center; padding: 50px; color: #95a5a6;">
+                <i class="fas fa-cookie-bite" style="font-size: 3rem; margin-bottom: 20px;"></i>
+                <h3>Belum ada makanan tersedia.</h3>
+            </div>
+
         </div>
     </div>
 </div>

@@ -1,69 +1,105 @@
 package org.delcom.app.controllers;
-import org.delcom.app.dto.*;
-import org.delcom.app.entities.*;
-import org.delcom.app.services.*;
+
+import org.delcom.app.dto.LoginForm;
+import org.delcom.app.dto.RegisterForm; 
+import org.delcom.app.entities.AuthToken;
+import org.delcom.app.entities.User;
+import org.delcom.app.services.AuthTokenService;
+import org.delcom.app.services.UserService;
 import org.delcom.app.utils.JwtUtil;
-import org.delcom.app.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.springframework.security.core.context.SecurityContextHolder;
-import jakarta.servlet.http.*;
+
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 
-@Controller @RequestMapping("/auth")
+@Controller
+@RequestMapping("/auth")
 public class AuthController {
-    @Autowired private UserService userService;
-    @Autowired private AuthTokenService authTokenService;
-    @Autowired private UserRepository userRepository;
 
-    @GetMapping("/login") public String login(Model model) { model.addAttribute("loginForm", new LoginForm()); return "login"; }
-    
-    @PostMapping("/login/post")
-    public String loginPost(@Valid @ModelAttribute LoginForm form, BindingResult res, HttpServletResponse resp) {
-        if (res.hasErrors()) return "login";
-        User user = userService.login(form.getEmail(), form.getPassword());
-        if (user == null) return "login"; // Tambah error message sendiri ya
+    @Autowired
+    private UserService userService;
 
-        String token = JwtUtil.generateToken(user.getId());
-        authTokenService.save(new AuthToken(user.getId(), token));
-        
-        Cookie cookie = new Cookie("AUTH_TOKEN", token);
-        cookie.setPath("/"); cookie.setHttpOnly(true);
-        resp.addCookie(cookie);
+    @Autowired
+    private AuthTokenService tokenService; 
 
-        return "redirect:/shop"; // SEMUA MASUK KE TOKO DULU
+    // 1. TAMPILKAN FORM REGISTER
+    @GetMapping("/register")
+    public String registerForm(Model model) {
+        model.addAttribute("registerForm", new RegisterForm());
+        return "pages/auth/register"; 
     }
 
-    @GetMapping("/register") public String register(Model model) { model.addAttribute("registerForm", new RegisterForm()); return "register"; }
-    
-    @PostMapping("/register/save")
-    public String regSave(@Valid @ModelAttribute RegisterForm form, BindingResult res) {
-        if(res.hasErrors()) return "register";
-        User u = new User(); u.setName(form.getName()); u.setEmail(form.getEmail()); u.setPassword(form.getPassword()); u.setRole("BUYER");
-        userService.register(u);
-        return "redirect:/auth/login";
-    }
-
-    @GetMapping("/logout")
-    public String logout(HttpServletResponse resp) {
-        Cookie c = new Cookie("AUTH_TOKEN", null); c.setPath("/"); c.setMaxAge(0); resp.addCookie(c);
-        return "redirect:/auth/login";
-    }
-
-    // FITUR SHOPEE: BUKA TOKO
-    @PostMapping("/become-seller")
-    public String becomeSeller() {
-        var auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth != null && auth.getPrincipal() instanceof User) {
-            User u = (User) auth.getPrincipal();
-            u.setRole("ADMIN");
-            userRepository.save(u);
-            return "redirect:/cookies"; // Langsung ke Dashboard
+    // 2. PROSES SIMPAN REGISTER
+    @PostMapping("/register/save") 
+    public String registerSave(@Valid @ModelAttribute RegisterForm form, BindingResult res) {
+        if (res.hasErrors()) {
+            return "pages/auth/register";
         }
-        return "redirect:/shop";
+        try {
+            userService.register(form); 
+            return "redirect:/auth/login?success_register";
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "redirect:/auth/register?error=" + e.getMessage();
+        }
+    }
+
+    // 3. TAMPILKAN FORM LOGIN
+    @GetMapping("/login")
+    public String loginForm(Model model) {
+        model.addAttribute("loginForm", new LoginForm());
+        return "pages/auth/login"; 
+    }
+
+    // 4. PROSES LOGIN
+    @PostMapping("/login/post")
+    public String loginPost(@Valid @ModelAttribute LoginForm form, BindingResult res, HttpServletResponse response) {
+        if (res.hasErrors()) return "pages/auth/login";
+
+        try {
+            User user = userService.login(form.getEmail(), form.getPassword());
+            
+            // Jika user tidak ditemukan atau password salah
+            if (user == null) return "redirect:/auth/login?error";
+
+            // Buat Token
+            String tokenStr = JwtUtil.generateToken(user.getId());
+            tokenService.saveToken(new AuthToken(user.getId(), tokenStr));
+
+            // --- PERBAIKAN DI SINI ---
+            Cookie httpCookie = new Cookie("AUTH_TOKEN", tokenStr);
+            httpCookie.setPath("/");
+            httpCookie.setHttpOnly(true);
+            
+            // UBAH INI: Set ke -1 agar cookie hilang saat browser ditutup
+            // Atau set ke waktu pendek misal 3600 (1 jam)
+            httpCookie.setMaxAge(-1); 
+            
+            response.addCookie(httpCookie);
+
+            return "redirect:/"; // Masuk ke Home
+
+        } catch (Exception e) {
+            e.printStackTrace(); 
+            return "redirect:/auth/login?error=server_error";
+        }
+    }
+    
+    // 5. PROSES LOGOUT (PENTING)
+    @GetMapping("/logout")
+    public String logout(HttpServletResponse response) {
+        // Timpa cookie lama dengan cookie kosong yang umurnya 0 detik
+        Cookie cookie = new Cookie("AUTH_TOKEN", null);
+        cookie.setPath("/");
+        cookie.setHttpOnly(true);
+        cookie.setMaxAge(0); // Langsung hapus
+        response.addCookie(cookie);
+        
+        return "redirect:/auth/login"; // Kembali ke halaman login
     }
 }

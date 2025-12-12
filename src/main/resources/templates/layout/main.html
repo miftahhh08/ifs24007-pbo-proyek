@@ -1,189 +1,97 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Yummy Market</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lapar.id - Jual Beli Makanan</title>
     
-    <!-- Bootstrap 5 -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    
-    <!-- Google Fonts (Fredoka & Nunito - Kunci tampilan Imut!) -->
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Google Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
     <style>
+        /* --- GLOBAL VARIABLES (Desain Awalmu) --- */
         :root {
-            --primary-color: #FF6B6B; /* Soft Coral / Merah Semangka */
-            --secondary-color: #FFD93D; /* Kuning Telur */
-            --bg-color: #FFF5F3; /* Pink Sangat Muda (Hampir Putih) */
-            --text-color: #4E342E; /* Coklat Tua (Lebih lembut dari Hitam) */
-            --glass-bg: rgba(255, 255, 255, 0.85);
+            --primary: #D32F2F;
+            --primary-dark: #b71c1c;
+            --dark: #1e272e;
+            --light-bg: #f9fafb;
+            --white: #ffffff;
+            --shadow: 0 10px 30px rgba(0,0,0,0.08);
         }
 
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        
         body {
-            font-family: 'Nunito', sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
+            background-color: var(--light-bg);
+            color: var(--dark);
             overflow-x: hidden;
+            display: flex; flex-direction: column; min-height: 100vh;
         }
 
-        h1, h2, h3, h4, h5, .navbar-brand, .btn {
-            font-family: 'Fredoka', sans-serif; /* Font Judul Bulat */
+        a { text-decoration: none; color: inherit; transition: 0.3s; }
+
+        /* NAVBAR (Glass Effect Tetap Ada) */
+        .navbar {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 18px 5%; 
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+            position: sticky; top: 0; z-index: 1000;
         }
 
-        /* --- NAVBAR LUCU --- */
-        .navbar-yummy {
-            background-color: var(--primary-color);
-            box-shadow: 0 4px 20px rgba(255, 107, 107, 0.2);
-            border-bottom-left-radius: 25px;
-            border-bottom-right-radius: 25px;
-            padding: 15px 0;
-        }
+        .logo { font-size: 24px; font-weight: 800; color: var(--primary); display: flex; align-items: center; gap: 10px; }
+        .nav-menu { display: flex; gap: 30px; }
+        .nav-link { font-weight: 500; font-size: 0.95rem; cursor: pointer;}
+        .nav-link:hover { color: var(--primary); }
 
-        .navbar-brand {
-            font-size: 1.8rem;
-            color: white !important;
-            text-shadow: 2px 2px 0px rgba(0,0,0,0.1);
-        }
+        .btn-nav { padding: 10px 24px; border-radius: 50px; font-weight: 600; font-size: 0.9rem; border: 2px solid var(--primary); transition: 0.3s; }
+        .btn-outline { color: var(--primary); background: transparent; }
+        .btn-outline:hover { background: var(--primary); color: white; }
+        .btn-fill { background: var(--primary); color: white; }
+        .btn-fill:hover { background: var(--primary-dark); border-color: var(--primary-dark); transform: translateY(-2px); box-shadow: 0 5px 15px rgba(211, 47, 47, 0.3); }
 
-        .nav-link {
-            color: rgba(255, 255, 255, 0.9) !important;
-            font-weight: 600;
-            transition: transform 0.2s;
-        }
-        .nav-link:hover {
-            transform: scale(1.1);
-            color: #fff !important;
-        }
-
-        /* --- ANIMASI MAKANAN JATUH --- */
-        #food-rain {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            pointer-events: none; z-index: -1;
-            overflow: hidden;
-        }
-        .falling-food {
-            position: absolute;
-            top: -50px;
-            font-size: 24px;
-            opacity: 0.4; /* Transparan biar ga norak */
-            animation: fall linear infinite;
-        }
-        @keyframes fall {
-            to { transform: translateY(110vh) rotate(360deg); }
-        }
-
-        /* --- TOMBOL GEMOY --- */
-        .btn-yummy {
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 50px;
-            padding: 10px 25px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            transition: all 0.2s;
-        }
-        .btn-yummy:hover {
-            background-color: #ff5252;
-            color: white;
-            transform: translateY(-3px);
-            box-shadow: 0 6px 12px rgba(255, 107, 107, 0.3);
-        }
-        .btn-yummy:active { transform: scale(0.95); }
-
-        /* Card Style */
-        .card-custom {
-            border: none;
-            border-radius: 25px;
-            background: white;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-            overflow: hidden;
-        }
+        /* FOOTER */
+        footer { background: var(--dark); color: white; padding: 40px 5%; text-align: center; margin-top: auto; }
     </style>
 </head>
-<body class="d-flex flex-column min-vh-100">
+<body>
 
-    <!-- Animasi Background -->
-    <div id="food-rain"></div>
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <a href="/" class="logo">
+            <i class="fas fa-utensils"></i> Lapar.id
+        </a>
+        
+        <div class="nav-menu">
+            <a href="/" class="nav-link">Beranda</a>
+            <a href="/market" class="nav-link">Jelajah Makanan</a>
+        </div>
 
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark navbar-yummy sticky-top">
-        <div class="container">
-            <a class="navbar-brand" th:href="@{/}">
-                <i class="bi bi-basket2-fill me-2 text-warning"></i>Yummy Market
-            </a>
-            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <i class="bi bi-list text-white fs-2"></i>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto align-items-center">
-                    
-                    <!-- Menu Belanja -->
-                    <li class="nav-item me-2">
-                        <a class="nav-link" th:href="@{/shop}">
-                            <i class="bi bi-shop me-1"></i> Belanja
-                        </a>
-                    </li>
+        <div style="display: flex; gap: 10px; align-items: center;">
+            <!-- User Belum Login -->
+            <div th:if="${user == null}" style="display:flex; gap:10px;">
+                <a href="/auth/login" class="btn-nav btn-outline">Masuk</a>
+                <a href="/auth/register" class="btn-nav btn-fill">Daftar</a>
+            </div>
 
-                    <!-- LOGIKA TOMBOL TOKO -->
-                    <!-- Jika Admin -->
-                    <li class="nav-item" th:if="${user != null and user.role == 'ADMIN'}">
-                        <a class="btn btn-light text-danger fw-bold rounded-pill px-3 shadow-sm" th:href="@{/cookies}">
-                            <i class="bi bi-speedometer2 me-1"></i> Dashboard Toko
-                        </a>
-                    </li>
-
-                    <!-- Jika Pembeli (Tombol Buka Toko) -->
-                    <li class="nav-item" th:if="${user != null and user.role == 'BUYER'}">
-                        <form th:action="@{/auth/become-seller}" method="post" class="d-inline">
-                            <button type="submit" class="btn btn-warning text-dark fw-bold rounded-pill px-3 shadow-sm" 
-                                    onclick="return confirm('Siap jadi juragan makanan? 🍳')">
-                                <i class="bi bi-shop-window me-1"></i> Buka Toko Gratis
-                            </button>
-                        </form>
-                    </li>
-
-                    <!-- Logout -->
-                    <li class="nav-item ms-3" th:if="${user != null}">
-                        <a th:href="@{/auth/logout}" class="nav-link text-white opacity-75" title="Keluar">
-                            <i class="bi bi-box-arrow-right fs-5"></i>
-                        </a>
-                    </li>
-                </ul>
+            <!-- User Sudah Login -->
+            <div th:if="${user != null}" style="display: flex; gap: 15px; align-items: center;">
+                <span style="font-weight: 600;" th:text="${user.name}">User</span>
+                <a href="/dashboard" class="btn-nav btn-outline" style="padding: 8px 15px; font-size: 0.8rem;"><i class="fas fa-store"></i> Dashboard</a>
+                <a href="/auth/logout" style="color: grey; font-size: 1.2rem;"><i class="fas fa-sign-out-alt"></i></a>
             </div>
         </div>
     </nav>
 
-    <!-- Content -->
-    <main class="container py-5 flex-grow-1">
-        <div layout:fragment="content"></div>
-    </main>
+    <!-- KONTEN DINAMIS (Ini Lubangnya) -->
+    <div layout:fragment="content"></div>
 
-    <!-- Footer -->
-    <footer class="py-4 text-center text-muted" style="background-color: #fff;">
-        <small>Made with <i class="bi bi-heart-fill text-danger"></i> by Yummy Market &copy; 2025</small>
+    <!-- FOOTER -->
+    <footer>
+        <p>&copy; 2025 Lapar.id - Project Akhir PBO.</p>
     </footer>
 
-    <!-- Script Animasi Makanan -->
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const container = document.getElementById('food-rain');
-            const foods = ['🍔','🍕','🍩','🍦','🥗','🍉','🥑','🥐','🍿','🍓'];
-            
-            for(let i=0; i<25; i++) {
-                const el = document.createElement('div');
-                el.classList.add('falling-food');
-                el.innerText = foods[Math.floor(Math.random() * foods.length)];
-                el.style.left = Math.random() * 100 + 'vw';
-                el.style.animationDuration = (Math.random() * 5 + 5) + 's';
-                el.style.animationDelay = Math.random() * 5 + 's';
-                el.style.fontSize = (Math.random() * 20 + 20) + 'px';
-                container.appendChild(el);
-            }
-        });
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

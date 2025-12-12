@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" layout:decorate="~{layout/main}">
+<head>
+    <title>Laporan Toko</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<div layout:fragment="content" class="container" style="padding: 40px 5%;">
+
+    <div style="display: flex; gap: 30px; flex-wrap: wrap;">
+        <!-- Kiri: Info -->
+        <div style="flex: 1; min-width: 300px; background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); text-align: center;">
+            <div style="width: 100px; height: 100px; background: #ffebee; color: #D32F2F; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 40px; margin: 0 auto 20px;">
+                <i class="fas fa-store"></i>
+            </div>
+            <h3 th:text="${user.name}">Nama Toko</h3>
+            <p style="color: #7f8c8d;" th:text="${user.email}">Email</p>
+            <hr style="margin: 20px 0; border: none; border-top: 1px solid #eee;">
+            <div style="text-align: left; line-height: 2;">
+                <p><i class="fas fa-check-circle" style="color: green;"></i> Status: <strong>Aktif</strong></p>
+                <p><i class="fas fa-map-marker-alt" style="color: #D32F2F;"></i> Lokasi: <strong>Kantin Pusat</strong></p>
+            </div>
+        </div>
+
+        <!-- Kanan: Chart -->
+        <div style="flex: 2; min-width: 300px; background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
+            <h3 style="margin-bottom: 20px;">📊 Statistik Penjualan</h3>
+            <canvas id="salesChart"></canvas>
+        </div>
+    </div>
+
+    <script>
+        const ctx = document.getElementById('salesChart');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat'],
+                datasets: [{
+                    label: 'Terjual (Porsi)',
+                    data: [12, 19, 8, 15, 22],
+                    backgroundColor: '#D32F2F',
+                    borderRadius: 5
+                }]
+            }
+        });
+    </script>
+
+</div>
+</body>
+</html>

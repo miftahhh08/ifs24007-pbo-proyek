@@ -1,18 +1,9 @@
 package org.delcom.app.views;
 
-/*  <-- TAMBAHKAN TANDA KOMENTAR PEMBUKA DI SINI
+// import ... (biarkan saja)
 
-import java.util.List;
-// ... import lainnya ...
-
-// @Controller  <-- INI PENYEBAB BENTROK, SUDAH DIMATIKAN
-// @RequestMapping("/auth")
+// @Controller  <-- KOMENTARI INI (Tambahkan // di depannya)
+// @RequestMapping("/auth") <-- KOMENTARI INI JUGA
 public class AuthView {
-
-    // SEMUA KODE DI DALAM SINI SUDAH TIDAK DIPAKAI
-    // KARENA KITA SUDAH PUNYA 'AuthController.java'
-    
-    // ... sisa kode lama ...
+    // ... isi kode lainnya biarkan saja, yang penting @Controller mati.
 }
-
-*/  // <-- TAMBAHKAN TANDA KOMENTAR PENUTUP DI SINI

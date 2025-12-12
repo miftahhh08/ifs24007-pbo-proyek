@@ -1,66 +1,56 @@
 package org.delcom.app.utils;
 
-import io.jsonwebtoken.*;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
-import java.util.Date;
-import java.util.UUID;
 
-import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
+import java.security.Key;
+import java.util.Date;
 
 public class JwtUtil {
 
-    // Ganti dengan secret key yang lebih aman dan simpan di tempat yang aman
-    private static final String SECRET_KEY = "NghR8fQn5O6V2z7VwpvQkDELCOMXoCYQbQZjx3xWUpPfw5i9L8RrGg==";
-    private static final long EXPIRATION_TIME = 1000 * 60 * 60 * 2; // 2 jam
-    private static final SecretKey key = Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
+    // Gunakan kunci yang cukup panjang agar aman dan valid untuk algoritma HS256
+    private static final String SECRET_STRING = "LaparIdRahasiaSuperAmanKunciUntukEnkripsiYangSangatPanjang123";
+    
+    // Buat Key Object yang konsisten
+    private static final Key KEY = Keys.hmacShaKeyFor(SECRET_STRING.getBytes(StandardCharsets.UTF_8));
 
-    public static SecretKey getKey() {
-        return key;
-    }
+    private static final long EXPIRATION_TIME = 86400000L; // 1 Hari
 
-    public static String generateToken(UUID userId) {
+    // Generate Token
+    public static String generateToken(Long userId) {
         return Jwts.builder()
-                .subject(userId.toString())
-                .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
-                .signWith(key)
+                .setSubject(String.valueOf(userId))
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+                .signWith(KEY, SignatureAlgorithm.HS256) // Gunakan KEY object
                 .compact();
     }
 
-    public static UUID extractUserId(String token) {
-        try {
-            Claims claims = Jwts.parser()
-                    .verifyWith(key)
-                    .build()
-                    .parseSignedClaims(token)
-                    .getPayload();
-
-            return UUID.fromString(claims.getSubject());
-        } catch (Exception e) {
-            return null;
-        }
+    // Ambil ID dari Token
+    public static Long getUserIdFromToken(String token) {
+        Claims claims = Jwts.parserBuilder() // Gunakan parserBuilder (versi baru)
+                .setSigningKey(KEY)          // Gunakan KEY yang sama
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+        return Long.parseLong(claims.getSubject());
     }
 
-    /**
-     * Validasi token
-     * 
-     * @param token         JWT token
-     * @param ignoreExpired jika true maka token expired tetap dianggap valid
-     */
-    public static boolean validateToken(String token, boolean ignoreExpired) {
+    // Validasi Token
+    public static boolean validateToken(String token) {
         try {
-            Jwts.parser()
-                    .verifyWith(key)
-                    .build()
-                    .parseSignedClaims(token);
-            return true; // valid
-        } catch (ExpiredJwtException e) {
-            if (ignoreExpired) {
-                return true; // abaikan expired
-            }
-            return false;
+            Jwts.parserBuilder()
+                .setSigningKey(KEY)
+                .build()
+                .parseClaimsJws(token);
+            return true;
         } catch (Exception e) {
-            return false; // token invalid
+            // Jika token salah/expired, code akan masuk sini
+            System.out.println("Token Error: " + e.getMessage()); 
+            return false;
         }
     }
 }

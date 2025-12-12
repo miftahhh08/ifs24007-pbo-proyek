@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" layout:decorate="~{layout/main}">
+<head><title>Profil Toko</title></head>
+<body>
+<div layout:fragment="content">
+
+    <!-- HEADER PROFIL TOKO -->
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-5">
+        <div class="row g-0">
+            <!-- Foto Toko -->
+            <div class="col-md-3 position-relative" style="min-height: 200px;">
+                <img th:if="${seller.shopImage}" th:src="@{'/uploads/'+${seller.shopImage}}" 
+                     class="w-100 h-100 object-fit-cover position-absolute">
+                <div th:unless="${seller.shopImage}" class="w-100 h-100 bg-secondary d-flex align-items-center justify-content-center text-white">
+                    <i class="bi bi-shop fs-1"></i>
+                </div>
+            </div>
+            
+            <!-- Info Toko -->
+            <div class="col-md-9 p-4 p-md-5 d-flex flex-column justify-content-center">
+                <div class="d-flex align-items-center mb-2">
+                    <span class="badge bg-warning text-dark me-2 rounded-pill px-3">
+                        <i class="bi bi-star-fill"></i> <span th:text="${seller.shopRating}">4.8</span>
+                    </span>
+                    <span class="text-muted small fw-bold">Official Partner</span>
+                </div>
+                
+                <h1 class="fw-bold mb-2 text-dark" th:text="${seller.shopName}">Nama Resto</h1>
+                <p class="text-secondary mb-4" th:text="${seller.shopDescription}">Deskripsi toko...</p>
+                
+                <div class="d-flex gap-2">
+                    <a th:href="'https://wa.me/'+${seller.phoneNumber}" target="_blank" class="btn btn-success rounded-pill px-4">
+                        <i class="bi bi-whatsapp me-2"></i> Chat Penjual
+                    </a>
+                    <a href="/market" class="btn btn-light border rounded-pill px-4">Kembali</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- DAFTAR MENU TOKO INI -->
+    <h4 class="fw-bold mb-4 border-start border-4 border-danger ps-3 text-dark">Daftar Menu</h4>
+    
+    <div class="row g-4">
+        <!-- Loop Produk Khusus Toko Ini -->
+        <div class="col-md-3" th:each="p : ${products}">
+            <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden">
+                
+                <!-- Gambar Produk -->
+                <div style="height: 180px; overflow: hidden;">
+                    <img th:if="${p.imagePath}" th:src="@{'/uploads/'+${p.imagePath}}" style="width:100%; height:100%; object-fit:cover">
+                    <div th:unless="${p.imagePath}" class="w-100 h-100 bg-light d-flex align-items-center justify-content-center">🍲</div>
+                </div>
+
+                <div class="card-body p-3 d-flex flex-column">
+                    <h5 class="fw-bold m-0 text-truncate" th:text="${p.name}">Menu</h5>
+                    <p class="text-muted small text-truncate" th:text="${p.description}">Desc</p>
+                    
+                    <!-- Varian -->
+                    <small class="text-secondary mb-3 d-block" 
+                           th:text="${p.flavor != null ? p.flavor : 'Original'}">Varian</small>
+
+                    <div class="mt-auto d-flex justify-content-between align-items-center">
+                        <h5 class="text-danger fw-bold m-0" th:text="'Rp '+${p.price}"></h5>
+                        
+                        <!-- Form Beli -->
+                        <form th:if="${(p.stock?:0) > 0}" th:action="@{/market/buy/{id}(id=${p.id})}" method="post" target="_blank">
+                            <!-- Dropdown Varian -->
+                            <div th:if="${p.flavor != null and p.flavor != ''}" class="mb-2">
+                                <select name="selectedFlavor" class="form-select form-select-sm bg-light border-0">
+                                    <option th:each="v : ${#strings.arraySplit(p.flavor, ',')}" th:value="${#strings.trim(v)}" th:text="${#strings.trim(v)}"></option>
+                                </select>
+                            </div>
+                            <input type="hidden" name="selectedFlavor" value="Original" th:unless="${p.flavor != null and p.flavor != ''}">
+                            <button class="btn btn-sm btn-primary-custom rounded-pill">Pesan</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>

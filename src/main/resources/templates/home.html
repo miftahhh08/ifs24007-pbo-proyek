@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" layout:decorate="~{layout/main}">
+<head>
+    <title>Beranda - Lapar.id</title>
+    <style>
+        /* HERO SECTION (Desain Awal) */
+        .hero-section {
+            padding: 80px 5%;
+            display: flex; align-items: center; justify-content: space-between;
+            background: linear-gradient(135deg, #fff5f5 0%, #ffffff 100%);
+            min-height: 85vh; /* Sedikit lebih tinggi biar megah */
+        }
+        .hero-text { max-width: 600px; }
+        .hero-text h1 { font-size: 3.5rem; line-height: 1.2; font-weight: 800; margin-bottom: 20px; }
+        .hero-text h1 span { color: #D32F2F; }
+        .hero-text p { font-size: 1.1rem; color: #57606f; margin-bottom: 30px; max-width: 500px; }
+
+        .hero-image img { width: 100%; max-width: 500px; animation: float 6s ease-in-out infinite; }
+        @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-20px); } 100% { transform: translateY(0px); } }
+
+        /* FEATURES SECTION */
+        .features { padding: 80px 5%; background: white; text-align: center; }
+        .features h2 { font-size: 2.5rem; font-weight: 700; margin-bottom: 50px; }
+        .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; }
+        
+        .feature-card { padding: 30px; border-radius: 20px; border: 1px solid #eee; transition: 0.3s; background: white; }
+        .feature-card:hover { transform: translateY(-10px); box-shadow: 0 10px 30px rgba(0,0,0,0.08); border-color: transparent; }
+        .icon-box { font-size: 40px; color: #D32F2F; margin-bottom: 20px; }
+
+        /* DASHBOARD MENU (Tampilan saat Login) */
+        .dashboard-welcome { background: linear-gradient(135deg, #D32F2F, #ff5252); color: white; padding: 60px 5%; border-radius: 0 0 50px 50px; text-align: center; margin-bottom: 50px; }
+        .menu-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; padding: 0 10%; margin-top: -80px; }
+        
+        .menu-card-link {
+            background: white; padding: 40px; border-radius: 20px; text-align: center;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1); transition: 0.3s; text-decoration: none; color: #1e272e;
+            border-bottom: 5px solid transparent;
+        }
+        .menu-card-link:hover { transform: translateY(-10px); border-bottom-color: #D32F2F; }
+        .menu-card-link i { font-size: 50px; color: #D32F2F; margin-bottom: 20px; }
+        .menu-card-link h3 { font-size: 1.4rem; font-weight: 700; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+
+<div layout:fragment="content">
+
+    <!-- ============================================ -->
+    <!-- TAMPILAN 1: DASHBOARD USER (JIKA LOGIN)      -->
+    <!-- ============================================ -->
+    <div th:if="${user != null}">
+        <div class="dashboard-welcome">
+            <h1 style="font-weight: 800;">Halo, <span th:text="${user.name}">User</span>! 👋</h1>
+            <p style="font-size: 1.2rem; opacity: 0.9;">Semoga harimu menyenangkan. Mau ngapain hari ini?</p>
+        </div>
+
+        <div class="menu-grid">
+            <!-- Link ke Jelajah -->
+            <a href="/market" class="menu-card-link">
+                <i class="fas fa-utensils"></i>
+                <h3>Jelajah Makanan</h3>
+                <p>Cari makan enak di sekitarmu.</p>
+            </a>
+            
+            <!-- Link ke Toko Saya -->
+            <a href="/dashboard" class="menu-card-link">
+                <i class="fas fa-store"></i>
+                <h3>Toko Saya</h3>
+                <p>Kelola menu daganganmu.</p>
+            </a>
+
+            <!-- Link ke Profil -->
+            <a href="/dashboard/profile" class="menu-card-link">
+                <i class="fas fa-chart-line"></i>
+                <h3>Laporan</h3>
+                <p>Cek statistik penjualan.</p>
+            </a>
+        </div>
+        
+        <div style="padding: 100px;"></div> <!-- Spacer -->
+    </div>
+
+    <!-- ============================================ -->
+    <!-- TAMPILAN 2: LANDING PAGE (JIKA BELUM LOGIN)  -->
+    <!-- ============================================ -->
+    <div th:if="${user == null}">
+        <!-- HERO SECTION -->
+        <section class="hero-section">
+            <div class="hero-text">
+                <h1>Lapar? Cari Makanan <br /><span>Enak &amp; Murah</span></h1>
+                <p>Platform marketplace makanan No.1 untuk mahasiswa. Pesan makanan favoritmu atau buka kantin digitalmu sendiri sekarang juga.</p>
+                <div style="display: flex; gap: 15px;">
+                    <a href="/market" class="btn-nav btn-fill" style="text-decoration: none;">Mulai Belanja</a>
+                    <a href="/auth/register" class="btn-nav btn-outline" style="text-decoration: none;">Buka Toko</a>
+                </div>
+            </div>
+            <div class="hero-image">
+                <!-- Gambar Kartun Makanan -->
+                <img src="https://cdn-icons-png.flaticon.com/512/2921/2921822.png" alt="Makanan" />
+            </div>
+        </section>
+
+        <!-- FEATURES SECTION -->
+        <section class="features">
+            <h2>Kenapa Lapar.id?</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="icon-box"><i class="fas fa-store"></i></div>
+                    <h3>Buka Toko Gratis</h3>
+                    <p>Mahasiswa bisa jualan tanpa modal sewa tempat.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="icon-box"><i class="fas fa-hamburger"></i></div>
+                    <h3>Menu Beragam</h3>
+                    <p>Dari nasi goreng sampai dessert kekinian ada di sini.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="icon-box"><i class="fas fa-wallet"></i></div>
+                    <h3>Harga Mahasiswa</h3>
+                    <p>Makanan enak ramah di kantong.</p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+</div>
+</body>
+</html>

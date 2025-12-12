@@ -2,14 +2,20 @@ package org.delcom.app.services;
 
 import org.delcom.app.entities.AuthToken;
 import org.delcom.app.repositories.AuthTokenRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import java.util.UUID;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional
 public class AuthTokenService {
-    @Autowired private AuthTokenRepository authTokenRepository;
 
-    public AuthToken save(AuthToken authToken) { return authTokenRepository.save(authToken); }
-    public AuthToken findUserToken(UUID userId, String token) { return authTokenRepository.findByUserIdAndToken(userId, token).orElse(null); }
+    private final AuthTokenRepository repository;
+
+    public AuthTokenService(AuthTokenRepository repository) {
+        this.repository = repository;
+    }
+
+    public void saveToken(AuthToken token) {
+        repository.save(token);
+    }
 }

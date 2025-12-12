@@ -1,51 +1,26 @@
 package org.delcom.app.interceptors;
 
-import org.delcom.app.configs.AuthContext;
-import org.delcom.app.entities.AuthToken;
-import org.delcom.app.services.AuthTokenService;
-import org.delcom.app.services.UserService;
-import org.delcom.app.utils.JwtUtil;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.servlet.http.HttpServletRequest; // Gunakan javax.servlet jika jakarta merah
+import jakarta.servlet.http.HttpServletResponse;
+
+import org.delcom.app.entities.User; // [FIX]: Ini yang biasanya bikin error
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import java.util.UUID;
 
 @Component
 public class AuthInterceptor implements HandlerInterceptor {
-    @Autowired AuthContext authContext;
-    @Autowired AuthTokenService authTokenService;
-    @Autowired UserService userService;
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        if (isPublic(request.getRequestURI())) return true;
-
-        String token = getToken(request);
-        if (token != null && JwtUtil.validateToken(token, true)) {
-            UUID userId = JwtUtil.extractUserId(token);
-            if (userId != null) {
-                AuthToken authToken = authTokenService.findUserToken(userId, token);
-                if (authToken != null) {
-                    var user = userService.getUserById(authToken.getUserId());
-                    if (user != null) {
-                        authContext.setAuthUser(user);
-                        return true;
-                    }
-                }
-            }
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        
+        if (auth != null && auth.getPrincipal() instanceof User) {
+            User user = (User) auth.getPrincipal();
+            request.setAttribute("user", user);
         }
-        response.sendRedirect(request.getContextPath() + "/auth/login");
-        return false;
+        
+        return true;
     }
-
-    private String getToken(HttpServletRequest req) {
-        if (req.getCookies() != null) {
-            for (Cookie c : req.getCookies()) if ("AUTH_TOKEN".equals(c.getName())) return c.getValue();
-        }
-        return null;
-    }
-    private boolean isPublic(String uri) { return uri.startsWith("/auth") || uri.startsWith("/css") || uri.startsWith("/js") || uri.startsWith("/images") || uri.equals("/error"); }
 }
