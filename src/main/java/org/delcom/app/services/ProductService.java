@@ -19,8 +19,8 @@ public class ProductService {
     @Autowired
     private ProductRepository productRepository;
     
-    // Folder upload gambar
-    private static final String UPLOAD_DIR = "src/main/resources/static/img/";
+    // Folder upload gambar - FIXED: Pakai absolute path ke target folder
+    private static final String UPLOAD_DIR = System.getProperty("user.dir") + "/src/main/resources/static/img/";
 
     /**
      * 1. Cari Produk Milik User (Query Manual)
