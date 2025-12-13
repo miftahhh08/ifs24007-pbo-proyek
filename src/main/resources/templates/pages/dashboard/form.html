@@ -1,42 +1,292 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" layout:decorate="~{layout/main}">
-<head><title>Form Produk</title></head>
-<body>
-<div layout:fragment="content" class="container" style="margin-top: 40px; max-width: 600px;">
+<head>
+    <title>Input Menu Spesial</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
     
-    <div class="card" style="padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); border: none;">
-        <h3 style="margin-bottom: 25px; font-weight: 700;">Form Data Menu</h3>
+    <style>
+        :root {
+            --color-sage-beige: #B2AC88;
+            --color-olive-light: #98A869;
+            --color-moss-green: #8A9A5B;
+            --bg-page: #F3F5F0;
+            --text-white: #FFFFFF;
+        }
 
-        <!-- FORM INPUT (Multipart untuk Upload Gambar) -->
-        <form th:action="@{/dashboard/save}" th:object="${product}" method="post" enctype="multipart/form-data">
-            <input type="hidden" th:field="*{id}"> <!-- Hidden ID untuk Edit -->
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-page);
+            overflow-x: hidden;
+        }
 
-            <div class="mb-3">
-                <label style="font-weight: 600;">Nama Makanan</label>
-                <input type="text" th:field="*{name}" class="form-control" required style="width: 100%; padding: 10px; margin-top: 5px; border-radius: 8px; border: 1px solid #ddd;">
+        .box-wrapper {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 40px 20px;
+            overflow: hidden;
+        }
+
+        .falling-food-container {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .food-item {
+            position: absolute;
+            top: -50px;
+            color: var(--color-olive-light);
+            opacity: 0.5;
+            animation: fallDown linear infinite;
+        }
+
+        @keyframes fallDown {
+            0% { transform: translateY(-80px) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.6; }
+            100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+        }
+
+        .box-card {
+            position: relative;
+            z-index: 10;
+            background-color: var(--color-moss-green);
+            width: 100%;
+            max-width: 500px;
+            padding: 45px;
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(138, 154, 91, 0.4);
+            color: var(--text-white);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .header-box h2 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 900;
+            font-size: 2.5rem;
+            margin-bottom: 5px;
+            color: var(--text-white);
+            letter-spacing: -0.5px;
+            text-align: center;
+        }
+
+        .header-box p {
+            text-align: center;
+            color: rgba(255,255,255,0.8);
+            font-size: 0.95rem;
+            margin-bottom: 35px;
+            font-style: italic;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .box-label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: rgba(255,255,255,0.95);
+            letter-spacing: 0.5px;
+        }
+
+        .box-input {
+            width: 100%;
+            padding: 14px 18px;
+            background: #FDFDFD;
+            border: 2px solid transparent;
+            border-radius: 12px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            color: #333;
+            transition: 0.3s;
+        }
+
+        .box-input:focus {
+            outline: none;
+            border-color: var(--color-sage-beige);
+            box-shadow: 0 0 0 4px rgba(255,255,255,0.2);
+        }
+
+        textarea.box-input {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        /* Image Preview Section */
+        .image-preview-section {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .current-image-preview {
+            width: 100%;
+            max-width: 250px;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            border: 3px solid rgba(255,255,255,0.3);
+            margin-bottom: 10px;
+        }
+
+        .image-info {
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.8);
+            font-style: italic;
+        }
+
+        .upload-area {
+            background: rgba(255,255,255,0.1);
+            border: 2px dashed rgba(255,255,255,0.5);
+            padding: 15px;
+            text-align: center;
+            border-radius: 12px;
+            transition: 0.3s;
+        }
+        
+        .upload-area:hover {
+            background: rgba(255,255,255,0.2);
+            border-color: #fff;
+        }
+
+        .upload-hint {
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.7);
+            margin-top: 5px;
+            font-style: italic;
+        }
+
+        .btn-box {
+            width: 100%;
+            padding: 16px;
+            margin-top: 15px;
+            background-color: var(--color-sage-beige);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .btn-box:hover {
+            filter: brightness(1.1);
+            transform: translateY(-2px);
+        }
+
+        .cancel-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+        
+        .cancel-link:hover { 
+            color: white; 
+            text-decoration: underline; 
+        }
+
+        @media (max-width: 600px) {
+            .box-card {
+                padding: 30px 25px;
+            }
+            
+            .header-box h2 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div layout:fragment="content">
+    <div class="box-wrapper">
+        
+        <div class="falling-food-container">
+            <i class="fas fa-pizza-slice food-item" style="left: 10%; font-size: 28px; animation-duration: 12s; animation-delay: 0s;"></i>
+            <i class="fas fa-hamburger food-item" style="left: 80%; font-size: 32px; animation-duration: 15s; animation-delay: 2s;"></i>
+            <i class="fas fa-utensils food-item" style="left: 25%; font-size: 24px; animation-duration: 18s; animation-delay: 5s;"></i>
+            <i class="fas fa-cookie-bite food-item" style="left: 60%; font-size: 30px; animation-duration: 10s; animation-delay: 1s;"></i>
+            <i class="fas fa-mug-hot food-item" style="left: 90%; font-size: 26px; animation-duration: 20s; animation-delay: 4s;"></i>
+            <i class="fas fa-bread-slice food-item" style="left: 5%; font-size: 35px; animation-duration: 14s; animation-delay: 7s;"></i>
+            <i class="fas fa-cheese food-item" style="left: 45%; font-size: 22px; animation-duration: 16s; animation-delay: 3s;"></i>
+        </div>
+
+        <div class="box-card">
+            
+            <div class="header-box">
+                <h2 th:text="${product.id != null ? 'Edit Menu' : 'New Menu'}">New Menu</h2>
+                <p>Silakan isi data makanan di bawah ini</p>
             </div>
 
-            <div class="mb-3">
-                <label style="font-weight: 600;">Harga (Rp)</label>
-                <input type="number" th:field="*{price}" class="form-control" required style="width: 100%; padding: 10px; margin-top: 5px; border-radius: 8px; border: 1px solid #ddd;">
-            </div>
+            <form th:action="@{/dashboard/save}" th:object="${product}" method="post" enctype="multipart/form-data">
+                <input type="hidden" th:field="*{id}">
+                
+                <!-- Hidden input untuk menyimpan nama gambar lama -->
+                <input type="hidden" th:field="*{image}" id="oldImageName">
 
-            <div class="mb-3">
-                <label style="font-weight: 600;">Deskripsi</label>
-                <textarea th:field="*{description}" class="form-control" rows="3" style="width: 100%; padding: 10px; margin-top: 5px; border-radius: 8px; border: 1px solid #ddd;"></textarea>
-            </div>
+                <div class="form-group">
+                    <label class="box-label">Nama Makanan</label>
+                    <input type="text" th:field="*{name}" class="box-input" placeholder="Masukkan nama..." required>
+                </div>
 
-            <!-- UPLOAD GAMBAR (Poin 4) -->
-            <div class="mb-4">
-                <label style="font-weight: 600;">Foto Makanan</label>
-                <input type="file" name="imageFile" class="form-control" style="margin-top: 5px;">
-                <small style="color: grey;">Biarkan kosong jika tidak ingin mengubah foto (saat edit).</small>
-            </div>
+                <div class="form-group">
+                    <label class="box-label">Harga (Rp)</label>
+                    <input type="number" th:field="*{price}" class="box-input" placeholder="0" required>
+                </div>
 
-            <button type="submit" class="btn-fill" style="width: 100%; padding: 12px; border: none; cursor: pointer;">Simpan Data</button>
-            <a href="/dashboard" style="display: block; text-align: center; margin-top: 15px; color: grey;">Batal</a>
-        </form>
+                <div class="form-group">
+                    <label class="box-label">Deskripsi</label>
+                    <textarea th:field="*{description}" class="box-input" placeholder="Jelaskan detail makanan..."></textarea>
+                </div>
+
+                <!-- Image Preview Section (Hanya muncul saat edit) -->
+                <div class="form-group" th:if="${product.image != null and product.image != ''}">
+                    <label class="box-label">Foto Saat Ini</label>
+                    <div class="image-preview-section">
+                        <img th:src="@{'/img/' + ${product.image}}" 
+                             class="current-image-preview" 
+                             th:alt="${product.name}">
+                        <p class="image-info">📸 Gambar akan tetap digunakan jika tidak diunggah foto baru</p>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="box-label">
+                        <span th:if="${product.image != null and product.image != ''}">Upload Foto Baru (Opsional)</span>
+                        <span th:unless="${product.image != null and product.image != ''}">Foto</span>
+                    </label>
+                    <div class="upload-area">
+                        <input type="file" name="imageFile" accept="image/*" style="width: 100%; color: white;">
+                    </div>
+                    <p class="upload-hint" th:if="${product.image != null and product.image != ''}">
+                        💡 Kosongkan jika tidak ingin mengubah gambar
+                    </p>
+                </div>
+
+                <button type="submit" class="btn-box">
+                    <i class="fas fa-save"></i> 
+                    <span th:text="${product.id != null ? 'Update Menu' : 'Simpan Menu'}">Simpan Menu</span>
+                </button>
+                
+                <a href="/dashboard" class="cancel-link">
+                    <i class="fas fa-times"></i> Batal
+                </a>
+            </form>
+        </div>
+
     </div>
 </div>
+
 </body>
 </html>

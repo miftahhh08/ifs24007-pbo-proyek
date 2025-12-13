@@ -6,32 +6,50 @@ import jakarta.validation.constraints.Size;
 
 public class RegisterForm {
 
-    @NotBlank(message = "Nama wajib diisi") // Sesuaikan pesan dengan 'actual' di log error
+    @NotBlank(message = "Nama wajib diisi") // Pakai NotBlank agar spasi dianggap error
     private String name;
 
-    @NotBlank(message = "Email wajib diisi") // Sesuaikan pesan
-    @Email(message = "Format email tidak valid") // Tambahkan validasi format
+    @NotBlank(message = "Email wajib diisi")
+    @Email(message = "Format email tidak valid")
     private String email;
 
-    @NotBlank(message = "Password wajib diisi") // Sesuaikan pesan
-    @Size(min = 6, message = "Password minimal 6 karakter") // Opsional, best practice
+    @NotBlank(message = "Password wajib diisi")
+    @Size(min = 6, message = "Password minimal 6 karakter")
     private String password;
 
-    // --- Constructor Kosong ---
-    public RegisterForm() {}
+    // --- 1. CONSTRUCTOR KOSONG (Wajib buat Spring Boot) ---
+    public RegisterForm() {
+    }
 
-    // --- Constructor Isi (Untuk Test Mudah) ---
+    // --- 2. CONSTRUCTOR LENGKAP (Wajib buat Test agar tidak error "undefined") ---
     public RegisterForm(String name, String email, String password) {
         this.name = name;
         this.email = email;
         this.password = password;
     }
 
-    // --- Getter & Setter ---
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
-    public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
-    public String getPassword() { return password; }
-    public void setPassword(String password) { this.password = password; }
+    // --- 3. GETTER & SETTER ---
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
 }

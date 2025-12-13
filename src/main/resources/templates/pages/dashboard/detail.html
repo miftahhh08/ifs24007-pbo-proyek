@@ -1,74 +1,36 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" layout:decorate="~{layout/main}">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Detail Menu</title>
+    <title>Detail Menu - Lapar.id</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
     <style>
-        .detail-card {
-            background: white; border-radius: 20px; overflow: hidden;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.08);
-            display: flex; flex-wrap: wrap; margin-top: 30px;
-        }
-        
-        /* Bagian Foto (Kiri) */
-        .detail-image {
-            flex: 1; min-width: 300px; background: #f1f2f6;
-            display: flex; align-items: center; justify-content: center;
-            position: relative; min-height: 400px;
-        }
-        .detail-image img { width: 100%; height: 100%; object-fit: cover; position: absolute; }
-        
-        /* Bagian Info (Kanan) */
-        .detail-info { flex: 1; padding: 50px; min-width: 300px; display: flex; flex-direction: column; justify-content: center; }
-        
-        .badge-category {
-            background: #ffebee; color: #D32F2F; padding: 5px 15px; 
-            border-radius: 50px; font-weight: 600; font-size: 0.8rem; width: fit-content; margin-bottom: 15px;
-        }
-
-        .price-tag { font-size: 2rem; font-weight: 800; color: #D32F2F; margin-bottom: 20px; }
-        
-        .btn-back {
-            background: white; border: 2px solid #ddd; padding: 12px 30px; 
-            border-radius: 50px; font-weight: 600; color: #666; margin-top: 30px; 
-            display: inline-block; width: fit-content;
-        }
-        .btn-back:hover { border-color: #333; color: #333; }
+        body { background-color: #F9F7F2; font-family: 'Poppins', sans-serif; }
+        .card-detail { border: none; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); overflow: hidden; }
+        .img-detail { width: 100%; height: 400px; object-fit: cover; }
+        .price-tag { font-size: 1.5rem; color: #8FA37E; font-weight: 700; }
+        .menu-title { font-family: 'Playfair Display', serif; font-size: 2.5rem; font-weight: 700; }
     </style>
 </head>
 <body>
-<div layout:fragment="content" class="container" style="padding: 40px 5%;">
-
-    <h2 style="font-weight: 800; color: #1e272e; margin-bottom: 10px;">Info Menu</h2>
-    <p style="color: #666;">Detail lengkap dari menu yang kamu jual.</p>
-
-    <div class="detail-card">
-        <!-- 1. Foto Menu -->
-        <div class="detail-image">
-            <img th:if="${product.image}" th:src="@{'/uploads/' + ${product.image}}" alt="Foto Makanan">
-            <div th:unless="${product.image}" style="font-size: 4rem; color: #ccc;">
-                <i class="fas fa-image"></i>
+    <div class="container py-5">
+        <a href="/dashboard" class="btn btn-outline-secondary mb-4">&larr; Kembali</a>
+        
+        <div class="card card-detail mx-auto" style="max-width: 800px;">
+            <img th:src="@{'/img/' + ${product.image}}" class="img-detail" alt="Foto Makanan">
+            <div class="card-body p-5">
+                <h1 class="menu-title" th:text="${product.name}">Nama Menu</h1>
+                <p class="price-tag mb-4" th:text="'Rp ' + ${product.price}">Rp 25.000</p>
+                <hr>
+                <h5 class="fw-bold mt-4">Deskripsi</h5>
+                <p class="text-muted" th:text="${product.description}">Deskripsi lengkap makanan...</p>
+                
+                <div class="mt-5 d-flex gap-2">
+                    <a th:href="@{/dashboard/edit/{id}(id=${product.id})}" class="btn btn-warning text-white px-4">Edit Menu</a>
+                    <a th:href="@{/dashboard/delete/{id}(id=${product.id})}" class="btn btn-danger px-4" onclick="return confirm('Hapus?');">Hapus Menu</a>
+                </div>
             </div>
         </div>
-
-        <!-- 2. Informasi Menu -->
-        <div class="detail-info">
-            <div class="badge-category"><i class="fas fa-tag"></i> Menu Toko</div>
-            
-            <h1 th:text="${product.name}" style="font-size: 2.5rem; font-weight: 800; line-height: 1.2; margin-bottom: 10px;">Nama Menu</h1>
-            
-            <div class="price-tag" th:text="'Rp ' + ${product.price}">Rp 0</div>
-            
-            <h4 style="font-weight: 700; margin-bottom: 10px; color: #333;">Deskripsi:</h4>
-            <p th:text="${product.description}" style="line-height: 1.8; color: #636e72; font-size: 1.05rem;">
-                Deskripsi makanan akan muncul di sini...
-            </p>
-
-            <a href="/dashboard" class="btn-back">
-                <i class="fas fa-arrow-left"></i> Kembali ke Toko
-            </a>
-        </div>
     </div>
-
-</div>
 </body>
 </html>

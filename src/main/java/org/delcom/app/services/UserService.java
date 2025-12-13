@@ -14,32 +14,52 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
-    // --- FUNGSI LOGIN ---
+    // 1. REGISTER
+    public void register(RegisterForm form) throws Exception {
+        if (userRepository.findByEmail(form.getEmail()).isPresent()) {
+            throw new Exception("Email sudah terdaftar");
+        }
+        
+        User user = new User(form.getName(), form.getEmail(), form.getPassword());
+        userRepository.save(user);
+        System.out.println(">>> USER BARU TERDAFTAR: " + user.getEmail() + " (ID: " + user.getId() + ")");
+    }
+
+    // 2. LOGIN
     public User login(String email, String password) {
-        String cleanEmail = email.trim().toLowerCase();
-        String cleanPass = password.trim();
-
-        User user = userRepository.findByEmail(cleanEmail);
-        if (user == null) return null;
-
-        if (user.getPassword().equals(cleanPass)) {
-            return user;
+        Optional<User> userOpt = userRepository.findByEmail(email);
+        
+        if (userOpt.isPresent()) {
+            User user = userOpt.get();
+            if (user.getPassword().equals(password)) {
+                System.out.println(">>> LOGIN VALID: " + email + " (ID: " + user.getId() + ")");
+                return user;
+            } else {
+                System.out.println(">>> LOGIN GAGAL: Password salah untuk " + email);
+            }
+        } else {
+            System.out.println(">>> LOGIN GAGAL: Email tidak ditemukan - " + email);
         }
         return null;
     }
 
-    // --- FUNGSI REGISTER ---
-    public void register(RegisterForm form) {
-        User newUser = new User();
-        newUser.setEmail(form.getEmail().trim().toLowerCase());
-        newUser.setPassword(form.getPassword().trim());
-        newUser.setName(form.getName());
-        userRepository.save(newUser);
+    // 3. GET USER BY ID
+    public User getUserById(Long id) {
+        Optional<User> userOpt = userRepository.findById(id);
+        if (userOpt.isPresent()) {
+            User user = userOpt.get();
+            System.out.println(">>> USER DITEMUKAN: ID=" + id + ", Email=" + user.getEmail());
+            return user;
+        } else {
+            System.out.println(">>> USER TIDAK DITEMUKAN: ID=" + id);
+            return null;
+        }
     }
 
-    // --- [BARU] FUNGSI CARI USER BERDASARKAN ID (Untuk Home) ---
-    public User getUserById(Long id) {
-        Optional<User> user = userRepository.findById(id);
-        return user.orElse(null); // Jika ketemu kembalikan user, jika tidak kembalikan null
+    // 4. SAVE USER (Update Profil Toko)
+    public void saveUser(User user) {
+        userRepository.save(user);
+        System.out.println(">>> USER UPDATED: " + user.getEmail() + " (ID: " + user.getId() + ")");
+        System.out.println(">>> Shop Name: " + user.getShopName());
     }
 }

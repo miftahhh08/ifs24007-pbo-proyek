@@ -1,158 +1,281 @@
 package org.delcom.app.services;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.reset; // WAJIB IMPORT INI
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-
 import org.delcom.app.entities.Product;
+import org.delcom.app.entities.User;
 import org.delcom.app.repositories.ProductRepository;
-import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockedStatic;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.multipart.MultipartFile;
 
-public class ProductServiceTests {
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.*;
+
+@ExtendWith(MockitoExtension.class)
+class ProductServiceTest {
+
+    @Mock
+    private ProductRepository productRepository;
+
+    @InjectMocks
+    private ProductService productService;
+
+    private User testUser;
+    private Product testProduct;
+
+    @BeforeEach
+    void setUp() {
+        testUser = new User();
+        testUser.setId(1L);
+        testUser.setName("User Test");
+
+        testProduct = new Product();
+        testProduct.setId(10L);
+        testProduct.setName("Produk Test");
+        testProduct.setPrice(100.0);
+        testProduct.setUser(testUser);
+    }
+
+    // ==========================================
+    // 1. VALIDATION TESTS (INI YANG MERAH DI SCREENSHOT)
+    // ==========================================
 
     @Test
-    @DisplayName("Pengujian ProductService (100% Coverage)")
-    public void testVariousProductService() throws IOException {
+    void testSaveProduct_ProductNull() {
+        // Menguji if (product == null)
+        Exception e = assertThrows(IllegalArgumentException.class, () -> 
+            productService.saveProduct(null, null, testUser)
+        );
+        assertEquals("Product tidak boleh null", e.getMessage());
+    }
 
-        // 1. Setup Mocks
-        ProductRepository repository = mock(ProductRepository.class);
-        FileStorageService fileService = mock(FileStorageService.class);
+    @Test
+    void testSaveProduct_UserNull() {
+        // Menguji if (user == null)
+        // Product harus ada isinya supaya lolos cek pertama, tapi user null
+        Exception e = assertThrows(IllegalArgumentException.class, () -> 
+            productService.saveProduct(testProduct, null, null)
+        );
+        assertEquals("User tidak boleh null", e.getMessage());
+    }
 
-        // 2. Instantiate Service
-        ProductService service = new ProductService(repository, fileService);
+    @Test
+    void testFindProductsByUser_Null() {
+        assertThrows(IllegalArgumentException.class, () -> productService.findProductsByUser(null));
+        assertThrows(IllegalArgumentException.class, () -> productService.findProductsByUser(new User())); // ID null
+    }
 
-        // ==========================================
-        // 1. METHOD: findAll
-        // ==========================================
-        {
-            List<Product> mockList = Collections.singletonList(new Product());
-            when(repository.findAll()).thenReturn(mockList);
+    @Test
+    void testDeleteProduct_NullId() {
+        assertThrows(IllegalArgumentException.class, () -> productService.deleteProduct(null));
+    }
 
-            List<Product> result = service.findAll();
+    @Test
+    void testFindById_NullInput() {
+        assertThrows(IllegalArgumentException.class, () -> productService.findById(null));
+    }
+    
+    @Test
+    void testUpdateProduct_NullChecks() {
+        assertThrows(IllegalArgumentException.class, () -> productService.updateProduct(null));
+        assertThrows(IllegalArgumentException.class, () -> productService.updateProduct(new Product())); // ID Null
+    }
 
-            assertEquals(1, result.size());
-            verify(repository, times(1)).findAll();
+    // ==========================================
+    // 2. LOGIC TESTS (SAVE, DELETE, FIND)
+    // ==========================================
+
+    @Test
+    void testFindAll() {
+        when(productRepository.findAll()).thenReturn(new ArrayList<>());
+        assertNotNull(productService.findAll());
+    }
+    
+    @Test
+    void testFindById() {
+        when(productRepository.findById(10L)).thenReturn(Optional.of(testProduct));
+        assertNotNull(productService.findById(10L));
+    }
+    
+    @Test
+    void testFindProductsByUser() {
+        when(productRepository.findByUserIdCustom(1L)).thenReturn(new ArrayList<>());
+        assertNotNull(productService.findProductsByUser(testUser));
+    }
+
+    // --- DELETE PRODUCT ---
+
+    @Test
+    void testDeleteProduct_Success_WithImage() {
+        testProduct.setImage("img.jpg");
+        when(productRepository.findById(10L)).thenReturn(Optional.of(testProduct));
+        doNothing().when(productRepository).deleteById(10L);
+
+        try (MockedStatic<Files> filesMock = mockStatic(Files.class);
+             MockedStatic<Paths> pathsMock = mockStatic(Paths.class)) {
+            
+            Path mockPath = mock(Path.class);
+            pathsMock.when(() -> Paths.get(anyString())).thenReturn(mockPath);
+            when(mockPath.resolve(anyString())).thenReturn(mockPath);
+            filesMock.when(() -> Files.exists(any(Path.class))).thenReturn(true);
+            
+            productService.deleteProduct(10L);
+            
+            filesMock.verify(() -> Files.delete(any(Path.class)), times(1));
         }
+    }
 
-        // ==========================================
-        // 2. METHOD: saveProduct
-        // ==========================================
-        {
-            // Skenario A: File NULL
-            {
-                reset(repository); // RESET MOCK AGAR COUNTER JADI 0
+    @Test
+    void testDeleteProduct_ImageDeleteFail() {
+        testProduct.setImage("img.jpg");
+        when(productRepository.findById(10L)).thenReturn(Optional.of(testProduct));
+        doNothing().when(productRepository).deleteById(10L);
 
-                Product product = new Product();
-                MultipartFile file = null;
-
-                when(repository.save(product)).thenReturn(product);
-
-                Product result = service.saveProduct(product, file);
-
-                assertNotNull(result);
-                verify(fileService, never()).store(any());
-                verify(repository, times(1)).save(product);
-            }
-
-            // Skenario B: File EMPTY
-            {
-                reset(repository); // RESET MOCK LAGI
-
-                Product product = new Product();
-                MultipartFile file = mock(MultipartFile.class);
-                
-                when(file.isEmpty()).thenReturn(true); 
-                when(repository.save(product)).thenReturn(product);
-
-                service.saveProduct(product, file);
-
-                verify(fileService, never()).store(any());
-                
-                // KARENA SUDAH DI-RESET, KITA EKSPEKTASI 1 KALI SAJA (BUKAN 2)
-                verify(repository, times(1)).save(product); 
-            }
-
-            // Skenario C: File VALID
-            {
-                reset(repository); // RESET MOCK
-
-                Product product = new Product();
-                MultipartFile file = mock(MultipartFile.class);
-                String generatedFileName = "uuid-gambar.jpg";
-
-                when(file.isEmpty()).thenReturn(false);
-                when(fileService.store(file)).thenReturn(generatedFileName);
-                when(repository.save(product)).thenReturn(product);
-
-                Product result = service.saveProduct(product, file);
-
-                assertEquals(generatedFileName, result.getImage());
-                verify(fileService, times(1)).store(file);
-                verify(repository, times(1)).save(product);
-            }
-
-            // Skenario D: IOException
-            {
-                reset(repository); // RESET MOCK
-
-                Product product = new Product();
-                MultipartFile file = mock(MultipartFile.class);
-
-                when(file.isEmpty()).thenReturn(false);
-                when(fileService.store(file)).thenThrow(new IOException("Disk Full"));
-
-                assertThrows(IOException.class, () -> {
-                    service.saveProduct(product, file);
-                });
-            }
+        try (MockedStatic<Files> filesMock = mockStatic(Files.class);
+             MockedStatic<Paths> pathsMock = mockStatic(Paths.class)) {
+            
+            Path mockPath = mock(Path.class);
+            pathsMock.when(() -> Paths.get(anyString())).thenReturn(mockPath);
+            when(mockPath.resolve(anyString())).thenReturn(mockPath);
+            filesMock.when(() -> Files.exists(any(Path.class))).thenReturn(true);
+            
+            filesMock.when(() -> Files.delete(any(Path.class))).thenThrow(new IOException("Locked"));
+            
+            assertDoesNotThrow(() -> productService.deleteProduct(10L));
+            verify(productRepository).deleteById(10L);
         }
+    }
 
-        // ==========================================
-        // 3. METHOD: findById
-        // ==========================================
-        {
-            // Skenario A: Ada
-            {
-                Long id = 1L;
-                Product product = new Product();
-                when(repository.findById(id)).thenReturn(Optional.of(product));
-                
-                Product result = service.findById(id);
-                assertEquals(product, result);
-            }
+    // --- SAVE PRODUCT ---
 
-            // Skenario B: Tidak Ada
-            {
-                Long id = 99L;
-                when(repository.findById(id)).thenReturn(Optional.empty());
-                
-                Product result = service.findById(id);
-                assertNull(result);
-            }
+    @Test
+    void testSaveProduct_NewFile_CreateDir() throws IOException {
+        testProduct.setId(null);
+        MultipartFile file = mock(MultipartFile.class);
+        when(file.isEmpty()).thenReturn(false);
+        when(file.getOriginalFilename()).thenReturn("new.jpg");
+        when(file.getBytes()).thenReturn("content".getBytes());
+        when(productRepository.save(any())).thenReturn(testProduct);
+
+        try (MockedStatic<Files> filesMock = mockStatic(Files.class);
+             MockedStatic<Paths> pathsMock = mockStatic(Paths.class)) {
+            
+            Path mockPath = mock(Path.class);
+            pathsMock.when(() -> Paths.get(anyString())).thenReturn(mockPath);
+            when(mockPath.resolve(anyString())).thenReturn(mockPath);
+            
+            // FOLDER BELUM ADA
+            filesMock.when(() -> Files.exists(any(Path.class))).thenReturn(false);
+            
+            productService.saveProduct(testProduct, file, testUser);
+            
+            filesMock.verify(() -> Files.createDirectories(any(Path.class)));
         }
+    }
+    
+    @Test
+    void testSaveProduct_EditWithFile_DeleteOldSuccess() throws IOException {
+        testProduct.setId(10L);
+        Product old = new Product(); old.setId(10L); old.setImage("old.jpg");
+        
+        when(productRepository.findById(10L)).thenReturn(Optional.of(old));
+        when(productRepository.save(any(Product.class))).thenReturn(testProduct);
+        
+        MultipartFile file = mock(MultipartFile.class);
+        when(file.isEmpty()).thenReturn(false);
+        when(file.getOriginalFilename()).thenReturn("new.jpg");
+        when(file.getBytes()).thenReturn("content".getBytes());
 
-        // ==========================================
-        // 4. METHOD: deleteProduct
-        // ==========================================
-        {
-            Long id = 5L;
-            service.deleteProduct(id);
-            verify(repository, times(1)).deleteById(id);
+        try (MockedStatic<Files> filesMock = mockStatic(Files.class);
+             MockedStatic<Paths> pathsMock = mockStatic(Paths.class)) {
+            
+            Path mockPath = mock(Path.class);
+            pathsMock.when(() -> Paths.get(anyString())).thenReturn(mockPath);
+            when(mockPath.resolve(anyString())).thenReturn(mockPath);
+            
+            // FILE LAMA ADA
+            filesMock.when(() -> Files.exists(any(Path.class))).thenReturn(true);
+            
+            productService.saveProduct(testProduct, file, testUser);
+            
+            filesMock.verify(() -> Files.delete(any(Path.class)));
         }
+    }
+    
+    @Test
+    void testSaveProduct_EditWithFile_DeleteOldFail() throws IOException {
+        testProduct.setId(10L);
+        Product old = new Product(); old.setId(10L); old.setImage("old.jpg");
+        when(productRepository.findById(10L)).thenReturn(Optional.of(old));
+        when(productRepository.save(any(Product.class))).thenReturn(testProduct);
+        
+        MultipartFile file = mock(MultipartFile.class);
+        when(file.isEmpty()).thenReturn(false);
+        when(file.getOriginalFilename()).thenReturn("new.jpg");
+        when(file.getBytes()).thenReturn("content".getBytes());
+
+        try (MockedStatic<Files> filesMock = mockStatic(Files.class);
+             MockedStatic<Paths> pathsMock = mockStatic(Paths.class)) {
+            
+            Path mockPath = mock(Path.class);
+            pathsMock.when(() -> Paths.get(anyString())).thenReturn(mockPath);
+            when(mockPath.resolve(anyString())).thenReturn(mockPath);
+            filesMock.when(() -> Files.exists(any(Path.class))).thenReturn(true);
+            
+            // ERROR DELETE
+            filesMock.when(() -> Files.delete(any(Path.class))).thenThrow(new IOException("Cannot delete"));
+
+            assertDoesNotThrow(() -> productService.saveProduct(testProduct, file, testUser));
+        }
+    }
+    
+    @Test
+    void testSaveProduct_NoFile_ExistingImageNotNull() throws IOException {
+        testProduct.setId(10L);
+        testProduct.setImage(null);
+        
+        Product old = new Product(); old.setId(10L); old.setImage("keep_me.jpg");
+        
+        when(productRepository.findById(10L)).thenReturn(Optional.of(old));
+        when(productRepository.save(any(Product.class))).thenReturn(testProduct);
+        
+        productService.saveProduct(testProduct, null, testUser);
+        
+        assertEquals("keep_me.jpg", testProduct.getImage());
+    }
+
+    // --- UPDATE HELPER ---
+
+    @Test
+    void testUpdateProduct() {
+        Product p = new Product(); p.setId(10L); p.setName("Up");
+        
+        when(productRepository.findById(10L)).thenReturn(Optional.of(testProduct));
+        when(productRepository.save(any(Product.class))).thenReturn(testProduct);
+        
+        productService.updateProduct(p);
+        
+        assertEquals("Up", testProduct.getName());
+    }
+    
+    @Test
+    void testUpdateProduct_NotFound() {
+        Product p = new Product(); p.setId(99L);
+        when(productRepository.findById(99L)).thenReturn(Optional.empty());
+        
+        assertThrows(IllegalArgumentException.class, () -> productService.updateProduct(p));
     }
 }

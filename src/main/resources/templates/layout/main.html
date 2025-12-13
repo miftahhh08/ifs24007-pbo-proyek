@@ -3,27 +3,27 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Lapar.id - Jual Beli Makanan</title>
+    <title>Lapar.id - Aesthetic Food Market</title>
     
-    <!-- Google Fonts & Icons -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+    <!-- Google Fonts: Playfair (Gendut) & Poppins (Rapi) -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
     <style>
-        /* --- GLOBAL VARIABLES (Desain Awalmu) --- */
+        /* --- GLOBAL VARIABLES (SAGE GREEN THEME) --- */
         :root {
-            --primary: #D32F2F;
-            --primary-dark: #b71c1c;
-            --dark: #1e272e;
-            --light-bg: #f9fafb;
+            --sage-dark: #8A9A5B;    /* Hijau Lumut (Pengganti Merah) */
+            --sage-light: #98A869;   /* Hijau Terang */
+            --sage-beige: #B2AC88;   /* Beige/Krem */
+            --cream-bg: #F3F5F0;     /* Background Cream */
+            --dark: #2f3e46;         /* Text Dark Greenish */
             --white: #ffffff;
-            --shadow: 0 10px 30px rgba(0,0,0,0.08);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
         
         body {
-            background-color: var(--light-bg);
+            background-color: var(--cream-bg);
             color: var(--dark);
             overflow-x: hidden;
             display: flex; flex-direction: column; min-height: 100vh;
@@ -31,29 +31,38 @@
 
         a { text-decoration: none; color: inherit; transition: 0.3s; }
 
-        /* NAVBAR (Glass Effect Tetap Ada) */
+        /* NAVBAR SAGE STYLE */
         .navbar {
             display: flex; justify-content: space-between; align-items: center;
-            padding: 18px 5%; 
-            background: rgba(255, 255, 255, 0.95);
+            padding: 20px 5%; 
+            background: rgba(243, 245, 240, 0.9); /* Transparan Cream */
             backdrop-filter: blur(10px);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
             position: sticky; top: 0; z-index: 1000;
         }
 
-        .logo { font-size: 24px; font-weight: 800; color: var(--primary); display: flex; align-items: center; gap: 10px; }
-        .nav-menu { display: flex; gap: 30px; }
-        .nav-link { font-weight: 500; font-size: 0.95rem; cursor: pointer;}
-        .nav-link:hover { color: var(--primary); }
+        .logo { 
+            font-family: 'Playfair Display', serif; /* Font Gendut */
+            font-size: 26px; font-weight: 900; 
+            color: var(--sage-dark); 
+            display: flex; align-items: center; gap: 10px; 
+        }
+        .logo i { background: var(--sage-beige); color: white; padding: 8px; border-radius: 10px; font-size: 18px; }
 
-        .btn-nav { padding: 10px 24px; border-radius: 50px; font-weight: 600; font-size: 0.9rem; border: 2px solid var(--primary); transition: 0.3s; }
-        .btn-outline { color: var(--primary); background: transparent; }
-        .btn-outline:hover { background: var(--primary); color: white; }
-        .btn-fill { background: var(--primary); color: white; }
-        .btn-fill:hover { background: var(--primary-dark); border-color: var(--primary-dark); transform: translateY(-2px); box-shadow: 0 5px 15px rgba(211, 47, 47, 0.3); }
+        .nav-menu { display: flex; gap: 30px; }
+        .nav-link { font-weight: 500; font-size: 0.95rem; cursor: pointer; color: var(--dark); }
+        .nav-link:hover { color: var(--sage-dark); }
+
+        /* BUTTONS NAVBAR */
+        .btn-nav { padding: 10px 24px; border-radius: 12px; font-weight: 600; font-size: 0.9rem; border: 2px solid var(--sage-dark); transition: 0.3s; }
+        
+        .btn-outline { color: var(--sage-dark); background: transparent; }
+        .btn-outline:hover { background: var(--sage-dark); color: white; }
+        
+        .btn-fill { background: var(--sage-dark); color: white; }
+        .btn-fill:hover { background: var(--sage-beige); border-color: var(--sage-beige); transform: translateY(-2px); }
 
         /* FOOTER */
-        footer { background: var(--dark); color: white; padding: 40px 5%; text-align: center; margin-top: auto; }
+        footer { background: var(--sage-dark); color: white; padding: 30px 5%; text-align: center; margin-top: auto; }
     </style>
 </head>
 <body>
@@ -66,31 +75,29 @@
         
         <div class="nav-menu">
             <a href="/" class="nav-link">Beranda</a>
-            <a href="/market" class="nav-link">Jelajah Makanan</a>
+            <a href="/market" class="nav-link">Jelajah Menu</a>
         </div>
 
         <div style="display: flex; gap: 10px; align-items: center;">
-            <!-- User Belum Login -->
             <div th:if="${user == null}" style="display:flex; gap:10px;">
                 <a href="/auth/login" class="btn-nav btn-outline">Masuk</a>
                 <a href="/auth/register" class="btn-nav btn-fill">Daftar</a>
             </div>
 
-            <!-- User Sudah Login -->
             <div th:if="${user != null}" style="display: flex; gap: 15px; align-items: center;">
-                <span style="font-weight: 600;" th:text="${user.name}">User</span>
-                <a href="/dashboard" class="btn-nav btn-outline" style="padding: 8px 15px; font-size: 0.8rem;"><i class="fas fa-store"></i> Dashboard</a>
-                <a href="/auth/logout" style="color: grey; font-size: 1.2rem;"><i class="fas fa-sign-out-alt"></i></a>
+                <span style="font-weight: 600; color: var(--sage-dark);" th:text="${user.name}">User</span>
+                <a href="/dashboard" class="btn-nav btn-outline" style="padding: 8px 15px;"><i class="fas fa-store"></i> Dashboard</a>
+                <a href="/auth/logout" style="color: #999; font-size: 1.2rem;"><i class="fas fa-sign-out-alt"></i></a>
             </div>
         </div>
     </nav>
 
-    <!-- KONTEN DINAMIS (Ini Lubangnya) -->
-    <div layout:fragment="content"></div>
+    <!-- KONTEN DINAMIS -->
+    <div layout:fragment="content" style="width: 100%;"></div>
 
     <!-- FOOTER -->
     <footer>
-        <p>&copy; 2025 Lapar.id - Project Akhir PBO.</p>
+        <p style="font-family: 'Playfair Display', serif;">&copy; 2025 Lapar.id - Proyek Akhir PBO.</p>
     </footer>
 
 </body>

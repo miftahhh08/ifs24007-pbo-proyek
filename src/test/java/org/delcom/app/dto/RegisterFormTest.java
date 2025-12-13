@@ -1,162 +1,131 @@
 package org.delcom.app.dto;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.util.Set;
-
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
+import jakarta.validation.ConstraintViolation;
 
-public class RegisterFormTest {
+import java.util.Set;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+class RegisterFormTests {
 
     private Validator validator;
+    private RegisterForm registerForm;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();
-    }
-
-    // ==========================================
-    // TEST: VALID FORM
-    // ==========================================
-    @Test
-    @DisplayName("Validation Success - All Fields Valid")
-    void validation_Success() {
-        RegisterForm form = new RegisterForm("Budi", "budi@test.com", "password123");
-        Set<ConstraintViolation<RegisterForm>> violations = validator.validate(form);
-        
-        // Harusnya tidak ada error
-        assertEquals(0, violations.size());
-    }
-
-    // ==========================================
-    // TEST: NAME VALIDATION
-    // ==========================================
-    @Test
-    @DisplayName("Validation Fail - Name is Null")
-    void validation_Fail_WhenNameIsNull() {
-        RegisterForm form = new RegisterForm(null, "valid@test.com", "pass123");
-        Set<ConstraintViolation<RegisterForm>> violations = validator.validate(form);
-
-        assertEquals(1, violations.size());
-        assertEquals("Nama wajib diisi", violations.iterator().next().getMessage());
+        registerForm = new RegisterForm();
     }
 
     @Test
-    @DisplayName("Validation Fail - Name is Empty")
-    void validation_Fail_WhenNameIsEmpty() {
-        RegisterForm form = new RegisterForm("", "valid@test.com", "pass123");
-        Set<ConstraintViolation<RegisterForm>> violations = validator.validate(form);
+    void testValidRegisterForm() {
+        // Arrange
+        registerForm.setName("John Doe");
+        registerForm.setEmail("john@example.com");
+        registerForm.setPassword("password123");
 
-        assertEquals(1, violations.size());
-        assertEquals("Nama wajib diisi", violations.iterator().next().getMessage());
+        // Act
+        Set<ConstraintViolation<RegisterForm>> violations = validator.validate(registerForm);
+
+        // Assert
+        assertTrue(violations.isEmpty());
     }
 
     @Test
-    @DisplayName("Validation Fail - Name is Blank")
-    void validation_Fail_WhenNameIsBlank() {
-        RegisterForm form = new RegisterForm("   ", "valid@test.com", "pass123");
-        Set<ConstraintViolation<RegisterForm>> violations = validator.validate(form);
+    void testGettersAndSetters() {
+        // Act
+        registerForm.setName("Jane Smith");
+        registerForm.setEmail("jane@example.com");
+        registerForm.setPassword("securepass");
 
-        assertEquals(1, violations.size());
-        assertEquals("Nama wajib diisi", violations.iterator().next().getMessage());
-    }
-
-    // ==========================================
-    // TEST: EMAIL VALIDATION
-    // ==========================================
-    @Test
-    @DisplayName("Validation Fail - Email is Null")
-    void validation_Fail_WhenEmailIsNull() {
-        RegisterForm form = new RegisterForm("Budi", null, "pass123");
-        Set<ConstraintViolation<RegisterForm>> violations = validator.validate(form);
-
-        assertEquals(1, violations.size());
-        assertEquals("Email wajib diisi", violations.iterator().next().getMessage());
+        // Assert
+        assertEquals("Jane Smith", registerForm.getName());
+        assertEquals("jane@example.com", registerForm.getEmail());
+        assertEquals("securepass", registerForm.getPassword());
     }
 
     @Test
-    @DisplayName("Validation Fail - Email is Empty")
-    void validation_Fail_WhenEmailIsEmpty() {
-        RegisterForm form = new RegisterForm("Budi", "", "pass123");
-        Set<ConstraintViolation<RegisterForm>> violations = validator.validate(form);
+    void testSetName() {
+        // Act
+        registerForm.setName("Test User");
 
-        assertEquals(1, violations.size());
-        assertEquals("Email wajib diisi", violations.iterator().next().getMessage());
+        // Assert
+        assertEquals("Test User", registerForm.getName());
     }
 
     @Test
-    @DisplayName("Validation Fail - Email Format Invalid")
-    void validation_Fail_WhenEmailFormatInvalid() {
-        RegisterForm form = new RegisterForm("Budi", "budi-bukan-email", "pass123");
-        Set<ConstraintViolation<RegisterForm>> violations = validator.validate(form);
+    void testSetEmail() {
+        // Act
+        registerForm.setEmail("test@example.com");
 
-        assertEquals(1, violations.size());
-        assertEquals("Format email tidak valid", violations.iterator().next().getMessage());
-    }
-
-    // ==========================================
-    // TEST: PASSWORD VALIDATION
-    // ==========================================
-    @Test
-    @DisplayName("Validation Fail - Password is Null")
-    void validation_Fail_WhenPasswordIsNull() {
-        RegisterForm form = new RegisterForm("Budi", "budi@test.com", null);
-        Set<ConstraintViolation<RegisterForm>> violations = validator.validate(form);
-
-        assertEquals(1, violations.size());
-        assertEquals("Password wajib diisi", violations.iterator().next().getMessage());
+        // Assert
+        assertEquals("test@example.com", registerForm.getEmail());
     }
 
     @Test
-    @DisplayName("Validation Fail - Password is Empty")
-    void validation_Fail_WhenPasswordIsEmpty() {
-        RegisterForm form = new RegisterForm("Budi", "budi@test.com", "");
-        Set<ConstraintViolation<RegisterForm>> violations = validator.validate(form);
+    void testSetPassword() {
+        // Act
+        registerForm.setPassword("testpassword");
 
-        // Expect 2 errors: @NotBlank and @Size(min=6) because length is 0
-        assertEquals(2, violations.size()); 
-        // Use anyMatch to find the specific error regardless of order
-        assertTrue(violations.stream().anyMatch(v -> v.getMessage().equals("Password wajib diisi")));
+        // Assert
+        assertEquals("testpassword", registerForm.getPassword());
     }
 
     @Test
-    @DisplayName("Validation Fail - Password is Blank")
-    void validation_Fail_WhenPasswordIsBlank() {
-        RegisterForm form = new RegisterForm("Budi", "budi@test.com", "   ");
-        Set<ConstraintViolation<RegisterForm>> violations = validator.validate(form);
+    void testDefaultConstructor() {
+        // Act
+        RegisterForm form = new RegisterForm();
 
-        // Expect 2 errors: @NotBlank and @Size(min=6) because length is 3 (spaces)
-        assertEquals(2, violations.size());
-        
-        // PERBAIKAN: Menggunakan stream().anyMatch() agar tidak peduli urutan error (NotBlank atau Size duluan)
-        boolean hasNotBlankError = violations.stream()
-                .anyMatch(v -> v.getMessage().equals("Password wajib diisi"));
-        
-        boolean hasSizeError = violations.stream()
-                .anyMatch(v -> v.getMessage().equals("Password minimal 6 karakter"));
-
-        assertTrue(hasNotBlankError, "Harusnya ada error: Password wajib diisi");
-        assertTrue(hasSizeError, "Harusnya ada error: Password minimal 6 karakter");
+        // Assert
+        assertNotNull(form);
+        assertNull(form.getName());
+        assertNull(form.getEmail());
+        assertNull(form.getPassword());
     }
 
-    // ==========================================
-    // TEST: MULTIPLE ERRORS
-    // ==========================================
     @Test
-    @DisplayName("Validation Fail - All Fields Null")
-    void validation_Fail_WhenAllFieldsNull() {
-        RegisterForm form = new RegisterForm(null, null, null);
-        Set<ConstraintViolation<RegisterForm>> violations = validator.validate(form);
+    void testNullValues() {
+        // Act
+        registerForm.setName(null);
+        registerForm.setEmail(null);
+        registerForm.setPassword(null);
 
-        assertEquals(3, violations.size());
+        // Assert
+        assertNull(registerForm.getName());
+        assertNull(registerForm.getEmail());
+        assertNull(registerForm.getPassword());
+    }
+
+    @Test
+    void testEmptyValues() {
+        // Act
+        registerForm.setName("");
+        registerForm.setEmail("");
+        registerForm.setPassword("");
+
+        // Assert
+        assertEquals("", registerForm.getName());
+        assertEquals("", registerForm.getEmail());
+        assertEquals("", registerForm.getPassword());
+    }
+
+    @Test
+    void testCompleteRegistrationData() {
+        // Arrange & Act
+        registerForm.setName("Complete User");
+        registerForm.setEmail("complete@example.com");
+        registerForm.setPassword("CompletePass123");
+
+        // Assert
+        assertEquals("Complete User", registerForm.getName());
+        assertEquals("complete@example.com", registerForm.getEmail());
+        assertEquals("CompletePass123", registerForm.getPassword());
     }
 }

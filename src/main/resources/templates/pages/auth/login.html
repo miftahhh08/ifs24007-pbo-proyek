@@ -5,153 +5,222 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Masuk - Lapar.id</title>
     
-    <!-- Google Fonts & Icons -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Google Fonts: Playfair Display (Gendut) & Poppins (Rapi) -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
+        /* --- TEMA SAGE AESTHETIC (Sama dengan Form.html) --- */
         :root {
-            --primary: #D32F2F;
-            --primary-dark: #b71c1c;
-            --dark: #1e272e;
-            --light-bg: #f4f6f8;
-            --input-bg: #f1f2f6;
+            --color-sage-beige: #B2AC88;  /* Warna Tombol */
+            --color-olive-light: #98A869; /* Warna Elemen Jatuh */
+            --color-moss-green: #8A9A5B;  /* Warna Kartu Utama */
+            
+            --bg-page: #F3F5F0;           /* Background Halaman */
+            --text-white: #FFFFFF;
+            --input-bg: #FDFDFD;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         
         body { 
-            background-color: var(--light-bg); 
+            background-color: var(--bg-page); 
+            font-family: 'Poppins', sans-serif;
             display: flex; justify-content: center; align-items: center; 
             min-height: 100vh; padding: 20px;
+            overflow: hidden; /* Biar animasi gak bikin scroll */
+            position: relative;
         }
-        
-        .login-card {
-            background: white; 
-            padding: 50px 40px; 
-            border-radius: 24px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.08);
-            width: 100%; 
-            max-width: 420px; 
-            text-align: center;
-            transition: transform 0.3s;
-        }
-        
-        .brand-logo {
-            font-size: 28px; font-weight: 800; color: var(--primary);
-            margin-bottom: 10px; display: inline-block;
-        }
-        .brand-logo i { background: var(--primary); color: white; padding: 8px; border-radius: 8px; font-size: 18px; margin-right: 5px; }
 
-        h2 { color: var(--dark); margin-bottom: 5px; font-weight: 700; font-size: 1.5rem; }
-        p.subtitle { color: #7f8c8d; margin-bottom: 30px; font-size: 0.95rem; }
+        /* --- BACKGROUND ANIMATION (HUJAN MAKANAN) --- */
+        .falling-container {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .food-item {
+            position: absolute;
+            top: -50px;
+            color: var(--color-olive-light);
+            opacity: 0.5;
+            animation: fallDown linear infinite;
+        }
+
+        @keyframes fallDown {
+            0% { transform: translateY(-80px) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.6; }
+            100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+        }
+
+        /* --- LOGIN CARD (Style Kotak Sage Green) --- */
+        .login-card {
+            position: relative;
+            z-index: 10;
+            background: var(--color-moss-green); /* Hijau Sage Utama */
+            color: var(--text-white);
+            
+            padding: 50px 40px; 
+            border-radius: 20px; /* Radius 20px (Sesuai Request) */
+            box-shadow: 0 15px 40px rgba(138, 154, 91, 0.4);
+            border: 1px solid rgba(255,255,255,0.2);
+            
+            width: 100%; 
+            max-width: 450px; 
+            text-align: center;
+        }
+        
+        /* Logo & Header */
+        .brand-logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 28px; font-weight: 900; 
+            color: var(--text-white);
+            margin-bottom: 5px; display: inline-flex; align-items: center; gap: 10px;
+        }
+        .brand-logo i { 
+            background: rgba(255,255,255,0.2); 
+            color: white; padding: 8px; border-radius: 8px; font-size: 18px; 
+        }
+
+        h2 { 
+            font-family: 'Playfair Display', serif;
+            font-weight: 900; 
+            font-size: 2rem;
+            margin-bottom: 5px; 
+            color: var(--text-white);
+        }
+        
+        p.subtitle { 
+            color: rgba(255,255,255,0.8); 
+            margin-bottom: 35px; font-size: 0.95rem; font-style: italic;
+        }
 
         /* Form Styling */
-        .form-group { margin-bottom: 20px; text-align: left; position: relative; }
+        .form-group { margin-bottom: 20px; text-align: left; }
         
         .form-group label { 
-            display: block; margin-bottom: 8px; font-weight: 500; 
-            color: var(--dark); font-size: 0.9rem; margin-left: 5px;
+            display: block; margin-bottom: 8px; font-weight: 600; 
+            color: rgba(255,255,255,0.9); font-size: 0.9rem; margin-left: 5px;
+            letter-spacing: 0.5px;
         }
         
         .input-wrapper { position: relative; }
         
         .input-wrapper i {
             position: absolute; left: 15px; top: 50%; transform: translateY(-50%);
-            color: #95a5a6; font-size: 1rem; transition: 0.3s;
+            color: #888; font-size: 1rem; transition: 0.3s; z-index: 2;
         }
 
         input {
-            width: 100%; padding: 14px 15px 14px 45px; /* Padding kiri besar untuk ikon */
-            border: 2px solid transparent; background: var(--input-bg);
-            border-radius: 12px; font-size: 0.95rem; transition: 0.3s; outline: none; color: var(--dark);
+            width: 100%; 
+            padding: 14px 15px 14px 45px; /* Padding kiri buat ikon */
+            border: 2px solid transparent; 
+            background: var(--input-bg); /* Putih bersih */
+            border-radius: 12px; /* Radius input */
+            font-size: 1rem; transition: 0.3s; outline: none; 
+            color: #333; font-family: 'Poppins', sans-serif;
         }
 
         input:focus { 
-            border-color: var(--primary); background: white; 
-            box-shadow: 0 5px 15px rgba(211, 47, 47, 0.1); 
+            border-color: var(--color-sage-beige); /* Warna Beige saat fokus */
+            box-shadow: 0 0 0 4px rgba(255,255,255,0.2);
         }
-        input:focus + i { color: var(--primary); } /* Ikon berubah warna saat fokus */
+        input:focus + i { color: var(--color-moss-green); }
 
+        /* Tombol */
         button {
-            width: 100%; padding: 14px; 
-            background: var(--primary); color: white;
-            border: none; border-radius: 50px; /* Bentuk Pill */
-            font-size: 1rem; font-weight: 600;
-            cursor: pointer; transition: 0.3s; margin-top: 10px;
-            box-shadow: 0 5px 15px rgba(211, 47, 47, 0.2);
+            width: 100%; padding: 15px; 
+            background: var(--color-sage-beige); /* Warna Beige #B2AC88 */
+            color: white;
+            border: none; border-radius: 12px; /* Radius Tombol */
+            font-size: 1.1rem; font-weight: 700;
+            cursor: pointer; transition: 0.3s; margin-top: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
         button:hover { 
-            background: var(--primary-dark); 
+            background: #a39d7a; /* Gelapin dikit */
             transform: translateY(-2px); 
-            box-shadow: 0 8px 20px rgba(211, 47, 47, 0.3); 
         }
 
         /* Footer Links */
-        .auth-footer { margin-top: 25px; font-size: 0.9rem; color: #7f8c8d; }
-        .auth-footer a { color: var(--primary); text-decoration: none; font-weight: 600; transition: 0.2s; }
-        .auth-footer a:hover { text-decoration: underline; }
+        .auth-footer { margin-top: 25px; font-size: 0.9rem; color: rgba(255,255,255,0.8); }
+        .auth-footer a { color: var(--text-white); text-decoration: underline; font-weight: 600; }
+        
+        .back-link { margin-top: 20px; display: block; font-size: 0.9rem; color: rgba(255,255,255,0.6); text-decoration: none; }
+        .back-link:hover { color: white; }
 
-        .back-link { margin-top: 15px; display: block; font-size: 0.85rem; color: #95a5a6; text-decoration: none; }
-        .back-link:hover { color: var(--dark); }
-
-        /* Alert Error */
+        /* Alert styling yang disesuaikan */
         .alert-error {
-            background: #ffebee; color: #c62828; padding: 12px; 
-            border-radius: 12px; margin-bottom: 25px; font-size: 0.9rem;
-            border: 1px solid #ffcdd2; display: flex; align-items: center; gap: 10px;
-            text-align: left;
+            background: rgba(255, 255, 255, 0.9); color: #c62828; 
+            padding: 12px; border-radius: 12px; margin-bottom: 25px; 
+            font-size: 0.9rem; font-weight: 500;
+            display: flex; align-items: center; gap: 10px;
         }
+
     </style>
 </head>
 <body>
 
+    <!-- Animasi Makanan Jatuh -->
+    <div class="falling-container">
+        <i class="fas fa-pizza-slice food-item" style="left: 10%; font-size: 28px; animation-duration: 12s; animation-delay: 0s;"></i>
+        <i class="fas fa-hamburger food-item" style="left: 80%; font-size: 32px; animation-duration: 15s; animation-delay: 2s;"></i>
+        <i class="fas fa-utensils food-item" style="left: 25%; font-size: 24px; animation-duration: 18s; animation-delay: 5s;"></i>
+        <i class="fas fa-cookie-bite food-item" style="left: 60%; font-size: 30px; animation-duration: 10s; animation-delay: 1s;"></i>
+        <i class="fas fa-mug-hot food-item" style="left: 90%; font-size: 26px; animation-duration: 20s; animation-delay: 4s;"></i>
+        <i class="fas fa-bread-slice food-item" style="left: 5%; font-size: 35px; animation-duration: 14s; animation-delay: 7s;"></i>
+    </div>
+
+    <!-- Login Card -->
     <div class="login-card">
-        <!-- Logo Branding -->
+        <!-- Logo -->
         <a href="/" style="text-decoration: none;">
             <div class="brand-logo"><i class="fas fa-utensils"></i> Lapar.id</div>
         </a>
-        <h2>Selamat Datang</h2>
-        <p class="subtitle">Masuk untuk mulai pesan makanan enak.</p>
+        
+        <h2>Welcome Back</h2>
+        <p class="subtitle">Please login to your account</p>
 
-        <!-- Notifikasi Error Login -->
+        <!-- Error Notification -->
         <div th:if="${param.error}" class="alert-error">
             <i class="fas fa-exclamation-circle"></i>
-            <span>Email atau Password salah! Coba cek lagi ya.</span>
+            <span>Email atau Password salah!</span>
         </div>
         
-        <!-- Notifikasi Sukses Register -->
-        <div th:if="${param.success_register}" class="alert-error" style="background: #e8f5e9; color: #2e7d32; border-color: #c8e6c9;">
+        <div th:if="${param.success_register}" class="alert-error" style="color: #2e7d32;">
             <i class="fas fa-check-circle"></i>
-            <span>Pendaftaran berhasil! Silakan login.</span>
+            <span>Register berhasil! Silakan login.</span>
         </div>
 
+        <!-- Form -->
         <form th:action="@{/auth/login/post}" method="post" th:object="${loginForm}">
             
             <div class="form-group">
-                <label>Email</label>
+                <label>Email Address</label>
                 <div class="input-wrapper">
-                    <input type="email" th:field="*{email}" placeholder="Contoh: budi@gmail.com" required>
-                    <i class="fas fa-envelope"></i> <!-- Ikon Amplop -->
+                    <input type="email" th:field="*{email}" placeholder="yourname@email.com" required>
+                    <i class="fas fa-envelope"></i>
                 </div>
             </div>
 
             <div class="form-group">
                 <label>Password</label>
                 <div class="input-wrapper">
-                    <input type="password" th:field="*{password}" placeholder="Masukkan password" required>
-                    <i class="fas fa-lock"></i> <!-- Ikon Gembok -->
+                    <input type="password" th:field="*{password}" placeholder="••••••••" required>
+                    <i class="fas fa-lock"></i>
                 </div>
             </div>
 
-            <button type="submit">Masuk Sekarang</button>
+            <button type="submit">Sign In</button>
         </form>
 
         <div class="auth-footer">
-            Belum punya akun? <a href="/auth/register">Daftar dulu</a>
+            Don't have an account? <a href="/auth/register">Sign Up</a>
         </div>
         
-        <a href="/" class="back-link">&larr; Kembali ke Beranda</a>
+        <a href="/" class="back-link">Back to Home</a>
     </div>
 
 </body>

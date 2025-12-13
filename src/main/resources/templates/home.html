@@ -2,43 +2,181 @@
 <html xmlns:th="http://www.thymeleaf.org" layout:decorate="~{layout/main}">
 <head>
     <title>Beranda - Lapar.id</title>
+    
+    <!-- Font Playfair (Gendut) & Poppins (Rapi) -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+    
     <style>
-        /* HERO SECTION (Desain Awal) */
-        .hero-section {
-            padding: 80px 5%;
-            display: flex; align-items: center; justify-content: space-between;
-            background: linear-gradient(135deg, #fff5f5 0%, #ffffff 100%);
-            min-height: 85vh; /* Sedikit lebih tinggi biar megah */
+        /* --- CONFIG WARNA SAGE --- */
+        :root {
+            --sage-dark: #8A9A5B;    /* Hijau Lumut Utama */
+            --sage-light: #B2AC88;   /* Beige Kehijauan */
+            --sage-accent: #606c38;  /* Hijau Tua Teks */
+            --cream-bg: #F3F5F0;     /* Background */
+            --white: #ffffff;
         }
-        .hero-text { max-width: 600px; }
-        .hero-text h1 { font-size: 3.5rem; line-height: 1.2; font-weight: 800; margin-bottom: 20px; }
-        .hero-text h1 span { color: #D32F2F; }
-        .hero-text p { font-size: 1.1rem; color: #57606f; margin-bottom: 30px; max-width: 500px; }
 
-        .hero-image img { width: 100%; max-width: 500px; animation: float 6s ease-in-out infinite; }
-        @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-20px); } 100% { transform: translateY(0px); } }
+        /* --- STYLES KHUSUS BERANDA --- */
 
-        /* FEATURES SECTION */
-        .features { padding: 80px 5%; background: white; text-align: center; }
-        .features h2 { font-size: 2.5rem; font-weight: 700; margin-bottom: 50px; }
-        .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; }
+        /* 1. DASHBOARD STYLE (SAAT LOGIN) */
+        .dashboard-welcome { 
+            /* Ganti Gradient Merah jadi Gradient Sage */
+            background: linear-gradient(135deg, var(--sage-dark), #588157); 
+            color: white; 
+            padding: 80px 5% 100px; /* Padding bawah dilebarkan buat naruh kartu */
+            border-radius: 0 0 50px 50px; 
+            text-align: center; 
+            margin-bottom: 50px;
+            position: relative;
+            overflow: hidden;
+        }
         
-        .feature-card { padding: 30px; border-radius: 20px; border: 1px solid #eee; transition: 0.3s; background: white; }
-        .feature-card:hover { transform: translateY(-10px); box-shadow: 0 10px 30px rgba(0,0,0,0.08); border-color: transparent; }
-        .icon-box { font-size: 40px; color: #D32F2F; margin-bottom: 20px; }
+        /* Hiasan background dashboard */
+        .dashboard-bg-icon {
+            position: absolute; color: rgba(255,255,255,0.1); font-size: 150px;
+            top: -20px; right: 10%; transform: rotate(15deg);
+        }
 
-        /* DASHBOARD MENU (Tampilan saat Login) */
-        .dashboard-welcome { background: linear-gradient(135deg, #D32F2F, #ff5252); color: white; padding: 60px 5%; border-radius: 0 0 50px 50px; text-align: center; margin-bottom: 50px; }
-        .menu-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; padding: 0 10%; margin-top: -80px; }
+        .menu-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); 
+            gap: 30px; 
+            padding: 0 10%; 
+            margin-top: -80px; /* Kartu naik ke atas menutupi header */
+            position: relative;
+            z-index: 10;
+        }
         
         .menu-card-link {
-            background: white; padding: 40px; border-radius: 20px; text-align: center;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.1); transition: 0.3s; text-decoration: none; color: #1e272e;
-            border-bottom: 5px solid transparent;
+            background: white; 
+            padding: 40px; 
+            border-radius: 24px; 
+            text-align: center;
+            box-shadow: 0 15px 35px rgba(138, 154, 91, 0.15); /* Shadow Hijau */
+            transition: 0.3s; 
+            text-decoration: none; 
+            color: #2f3e46;
+            border: 1px solid transparent;
         }
-        .menu-card-link:hover { transform: translateY(-10px); border-bottom-color: #D32F2F; }
-        .menu-card-link i { font-size: 50px; color: #D32F2F; margin-bottom: 20px; }
-        .menu-card-link h3 { font-size: 1.4rem; font-weight: 700; margin-bottom: 10px; }
+        .menu-card-link:hover { 
+            transform: translateY(-10px); 
+            border-color: var(--sage-dark);
+            box-shadow: 0 20px 40px rgba(138, 154, 91, 0.25);
+        }
+        .menu-card-link i { 
+            font-size: 50px; 
+            color: var(--sage-dark); /* Ikon Hijau */
+            margin-bottom: 20px; 
+            background: #f1f5eb;
+            padding: 20px;
+            border-radius: 50%;
+            transition: 0.3s;
+        }
+        .menu-card-link:hover i {
+            background: var(--sage-dark);
+            color: white;
+        }
+        .menu-card-link h3 { 
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem; 
+            font-weight: 700; 
+            margin-bottom: 10px; 
+        }
+
+        /* 2. LANDING PAGE STYLE (SAAT BELUM LOGIN) */
+        .hero-section {
+            position: relative;
+            padding: 60px 8%;
+            display: flex; align-items: center; justify-content: space-between;
+            min-height: 85vh;
+            overflow: hidden;
+        }
+
+        .hero-text { max-width: 50%; z-index: 10; }
+        .hero-text h1 { 
+            font-family: 'Playfair Display', serif;
+            font-size: 3.8rem; 
+            line-height: 1.1; 
+            font-weight: 900; 
+            color: var(--sage-accent);
+            margin-bottom: 20px; 
+        }
+        .hero-text h1 span { 
+            color: var(--sage-dark); 
+            position: relative;
+        }
+        /* Garis bawah estetik */
+        .hero-text h1 span::after {
+            content: ''; position: absolute; bottom: 5px; left: 0; width: 100%; height: 12px;
+            background: rgba(186, 210, 159, 0.5); z-index: -1; border-radius: 10px;
+        }
+
+        .hero-text p { font-size: 1.1rem; color: #666; margin-bottom: 35px; line-height: 1.6; }
+
+        /* Ganti Gambar Statis dengan Animasi CSS */
+        .hero-visual {
+            flex: 1; display: flex; justify-content: center; align-items: center; position: relative; height: 500px;
+        }
+        .blob-bg {
+            position: absolute; width: 400px; height: 400px; background: #e2e8d8; border-radius: 50%; z-index: 1;
+            animation: pulse 6s infinite ease-in-out;
+        }
+        .main-icon {
+            font-size: 220px; color: var(--sage-dark); position: relative; z-index: 2;
+            filter: drop-shadow(0 20px 30px rgba(138, 154, 91, 0.3));
+            animation: floatMain 6s ease-in-out infinite;
+        }
+        .orbit-icon {
+            position: absolute; font-size: 40px; color: var(--sage-light);
+            animation: floatOrbit 5s infinite alternate ease-in-out;
+        }
+
+        /* Tombol Landing Page */
+        .btn-sage-fill {
+            padding: 15px 35px; background: var(--sage-dark); color: white; border-radius: 50px; font-weight: 700;
+            box-shadow: 0 10px 20px rgba(138, 154, 91, 0.3); transition: 0.3s;
+        }
+        .btn-sage-fill:hover { transform: translateY(-5px); background: var(--sage-accent); }
+        
+        .btn-sage-outline {
+            padding: 15px 35px; background: transparent; color: var(--sage-dark); border: 2px solid var(--sage-dark);
+            border-radius: 50px; font-weight: 700; transition: 0.3s;
+        }
+        .btn-sage-outline:hover { background: var(--sage-dark); color: white; }
+
+        /* FEATURES SECTION */
+        .features { padding: 80px 8%; background: white; text-align: center; }
+        .features h2 { 
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem; font-weight: 900; color: var(--sage-accent); margin-bottom: 50px; 
+        }
+        .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; }
+        
+        .feature-card { 
+            padding: 40px 30px; border-radius: 20px; background: var(--cream-bg); 
+            transition: 0.3s; border: 1px solid transparent; 
+        }
+        .feature-card:hover { 
+            transform: translateY(-10px); background: white; border-color: var(--sage-dark);
+            box-shadow: 0 15px 35px rgba(138, 154, 91, 0.15); 
+        }
+        .icon-box { 
+            width: 70px; height: 70px; background: white; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 30px; color: var(--sage-dark); margin: 0 auto 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+        .feature-card h3 { font-family: 'Playfair Display', serif; font-weight: 700; margin-bottom: 10px; color: var(--sage-accent); }
+
+        /* Animations */
+        @keyframes pulse { 0%,100% {transform: scale(1);} 50% {transform: scale(1.05);} }
+        @keyframes floatMain { 0%,100% {transform: translateY(0);} 50% {transform: translateY(-25px);} }
+        @keyframes floatOrbit { 0% {transform: translateY(0);} 100% {transform: translateY(-15px);} }
+        
+        /* Hujan Makanan */
+        .rain-item { position: absolute; color: var(--sage-light); opacity: 0.3; animation: rain 15s linear infinite; pointer-events: none; }
+        @keyframes rain { from {transform: translateY(-50px) rotate(0deg); opacity: 0;} 20% {opacity: 0.4;} to {transform: translateY(100vh) rotate(360deg); opacity: 0;} }
+
     </style>
 </head>
 <body>
@@ -50,53 +188,72 @@
     <!-- ============================================ -->
     <div th:if="${user != null}">
         <div class="dashboard-welcome">
-            <h1 style="font-weight: 800;">Halo, <span th:text="${user.name}">User</span>! 👋</h1>
-            <p style="font-size: 1.2rem; opacity: 0.9;">Semoga harimu menyenangkan. Mau ngapain hari ini?</p>
+            <i class="fas fa-utensils dashboard-bg-icon"></i> <!-- Hiasan Background -->
+            <h1 style="font-family: 'Playfair Display', serif; font-weight: 900; font-size: 3rem;">
+                Halo, <span th:text="${user.name}">User</span>! 👋
+            </h1>
+            <p style="font-size: 1.1rem; opacity: 0.9; font-weight: 300;">
+                Mau cari makan enak apa hari ini?
+            </p>
         </div>
 
         <div class="menu-grid">
             <!-- Link ke Jelajah -->
             <a href="/market" class="menu-card-link">
-                <i class="fas fa-utensils"></i>
-                <h3>Jelajah Makanan</h3>
-                <p>Cari makan enak di sekitarmu.</p>
+                <i class="fas fa-search-location"></i>
+                <h3>Jelajah Menu</h3>
+                <p>Temukan makanan enak di sekitarmu.</p>
             </a>
             
             <!-- Link ke Toko Saya -->
             <a href="/dashboard" class="menu-card-link">
-                <i class="fas fa-store"></i>
+                <i class="fas fa-store-alt"></i>
                 <h3>Toko Saya</h3>
-                <p>Kelola menu daganganmu.</p>
+                <p>Tambah dan kelola menu daganganmu.</p>
             </a>
 
             <!-- Link ke Profil -->
             <a href="/dashboard/profile" class="menu-card-link">
-                <i class="fas fa-chart-line"></i>
-                <h3>Laporan</h3>
-                <p>Cek statistik penjualan.</p>
+                <i class="fas fa-user-circle"></i>
+                <h3>Profil & Akun</h3>
+                <p>Atur informasi akun pribadimu.</p>
             </a>
         </div>
         
-        <div style="padding: 100px;"></div> <!-- Spacer -->
+        <div style="padding: 60px;"></div> <!-- Spacer Bawah -->
     </div>
 
     <!-- ============================================ -->
     <!-- TAMPILAN 2: LANDING PAGE (JIKA BELUM LOGIN)  -->
     <!-- ============================================ -->
     <div th:if="${user == null}">
+        
         <!-- HERO SECTION -->
         <section class="hero-section">
+            
+            <!-- Animasi Hujan Makanan -->
+            <div style="position: absolute; width: 100%; height: 100%; top: 0; left: 0; pointer-events: none;">
+                <i class="fas fa-pizza-slice rain-item" style="left: 10%; font-size: 25px; animation-duration: 12s;"></i>
+                <i class="fas fa-burger rain-item" style="left: 40%; font-size: 35px; animation-duration: 16s; animation-delay: 2s;"></i>
+                <i class="fas fa-ice-cream rain-item" style="left: 75%; font-size: 30px; animation-duration: 14s; animation-delay: 5s;"></i>
+            </div>
+
             <div class="hero-text">
-                <h1>Lapar? Cari Makanan <br /><span>Enak &amp; Murah</span></h1>
-                <p>Platform marketplace makanan No.1 untuk mahasiswa. Pesan makanan favoritmu atau buka kantin digitalmu sendiri sekarang juga.</p>
+                <h1>Lapar? Cari Makanan <br /><span>Enak &amp; Sehat</span></h1>
+                <p>Platform marketplace makanan aesthetic No.1 untuk mahasiswa. Pesan makanan favoritmu atau buka kantin digitalmu sendiri sekarang juga.</p>
                 <div style="display: flex; gap: 15px;">
-                    <a href="/market" class="btn-nav btn-fill" style="text-decoration: none;">Mulai Belanja</a>
-                    <a href="/auth/register" class="btn-nav btn-outline" style="text-decoration: none;">Buka Toko</a>
+                    <a href="/market" class="btn-sage-fill">Mulai Belanja</a>
+                    <a href="/auth/register" class="btn-sage-outline">Buka Toko</a>
                 </div>
             </div>
-            <div class="hero-image">
-                <!-- Gambar Kartun Makanan -->
-                <img src="https://cdn-icons-png.flaticon.com/512/2921/2921822.png" alt="Makanan" />
+            
+            <!-- Visual Hero (GANTI GAMBAR KARTUN DENGAN ANIMASI) -->
+            <div class="hero-visual">
+                <div class="blob-bg"></div>
+                <i class="fas fa-hamburger main-icon"></i>
+                <!-- Ikon Kecil -->
+                <i class="fas fa-utensils orbit-icon" style="top: 10%; right: 10%;"></i>
+                <i class="fas fa-mug-hot orbit-icon" style="bottom: 20%; left: 0; animation-delay: 1s;"></i>
             </div>
         </section>
 
@@ -110,7 +267,7 @@
                     <p>Mahasiswa bisa jualan tanpa modal sewa tempat.</p>
                 </div>
                 <div class="feature-card">
-                    <div class="icon-box"><i class="fas fa-hamburger"></i></div>
+                    <div class="icon-box"><i class="fas fa-utensils"></i></div>
                     <h3>Menu Beragam</h3>
                     <p>Dari nasi goreng sampai dessert kekinian ada di sini.</p>
                 </div>
